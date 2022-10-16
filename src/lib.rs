@@ -1,3 +1,3 @@
-mod module {
+pub mod snn;
+pub mod models;
 
-}

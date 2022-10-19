@@ -1,3 +1,4 @@
+
 use crate::snn::neuron::Neuron;
 
 // * LIF submodule *
@@ -21,9 +22,17 @@ impl LifNeuron {
 }
 
 impl Neuron for LifNeuron {
-    fn compute_v_mem(t: u64, weighted_sum: f64) -> f64 {
-        //Implement the function with the right formula
-        0.0
+    fn compute_v_mem(&mut self,t: u64, weighted_sum: f64) -> u8 {
+        let exponent = -( ((t - self.ts_prev) as f64 ) / self.tau);
+        let v_mem = self.v_rest + (self.v_mem_ts_prev - self.v_rest)  * 2.71828 ^exponent + weighted_sum;
+        self.v_mem_ts_prev = v_mem;
+         if v_mem > self.v_th {
+             self.ts_prev = t;
+             return 1
+        }
+        else {
+            return 0;
+        }
     }
 }
 

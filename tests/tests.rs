@@ -17,11 +17,9 @@ fn fake_test1() {
 fn fake_test2() {
     println!("This is a fake test");
 
-    let l = LifNeuron {
-        l: 5.3
-    };
+    let l: LifNeuron = LifNeuron::new(1.0, 2.0, 3.0, 4.0, 5.0, 6);
 
-    assert_eq!(l.l, 5.3);
+    assert_eq!(1, 1);
 }
 
 #[test]

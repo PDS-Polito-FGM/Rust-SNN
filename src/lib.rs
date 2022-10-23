@@ -1,3 +1,2 @@
-pub mod snn;
 pub mod models;
-
+pub mod snn;

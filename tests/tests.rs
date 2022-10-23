@@ -76,6 +76,7 @@ fn fake_test2() {
 }
 
 #[test]
+#[ignore]
 fn fake_test3() {
     println!("This is a fake test");
 

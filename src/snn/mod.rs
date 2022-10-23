@@ -1,10 +1,10 @@
-use crate::snn::layer::{Layer};
+
+use crate::snn::layer::Layer;
 use crate::snn::neuron::Neuron;
 use std::sync::mpsc::channel;
 
-// * submodules *
-pub mod builder;
-mod layer; // private
+pub mod builders;
+    mod layer; // private
 pub mod neuron;
 
 // * SNN module *

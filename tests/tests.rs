@@ -1,69 +1,83 @@
+use pds_snn::builders::SnnBuilder;
 use pds_snn::models::neuron::lif::LifNeuron;
-use pds_snn::snn::builder::Builder;
-use pds_snn::snn::SNN;
+use pds_snn::SNN;
 
 #[test]
 fn fake_test1() {
-    println!("This is a fake test");
+    println!("This is a fake test to check the Fluent Builder pattern");
 
-    /*
-    let mut b = Builder::new();
-    let snn = b
-        .with_input_dimensions(3)
+    let builder = SnnBuilder::new();
+
+    let snn = builder
         .add_layer()
-        .weights(vec![vec![0.1, 0.1, 0.3], vec![0.2, 0.1, 0.3]])
-        .neurons(vec![
-            LifNeuron::new(0.0, 0.0, 0.0, 0.0),
-            LifNeuron::new(0.0, 0.0, 0.0, 0.0),
-        ])
-        .intraweights(vec![vec![-0.1], vec![-0.2]])
+            .weights([
+                [0.1, 0.1, 0.3],
+                [0.2, 0.1, 0.3]
+            ])
+            .neurons([
+                LifNeuron::new(0.0, 0.0, 0.0, 0.0),
+                LifNeuron::new(0.0, 0.0, 0.0, 0.0),
+            ])
+            .intra_weights([
+                [ 0.0, -0.1],
+                [-0.1, -0.0]
+            ])
+        .add_layer()
+            .weights([
+                [0.1, 0.1],
+                [0.2, 0.3],
+                [0.5, 0.1]
+            ])
+            .neurons([
+                LifNeuron::new(0.0, 0.0, 0.0, 0.0),
+                LifNeuron::new(0.0, 0.0, 0.0, 0.0),
+                LifNeuron::new(0.0, 0.0, 0.0, 0.0)
+            ])
+            .intra_weights([
+                [ 0.0, -0.1, -0.3],
+                [-0.2,  0.0, -0.5],
+                [-0.1, -0.9,  0.0]
+            ])
         .build();
-    .add_layer()
-    .weights(vec![
-        vec![0.1, 0.1, 0.3],
-        vec![0.2, 0.1, 0.3]
-    ])
-    .neurons(vec![
-        LifNeuron::new(0.0, 0.0, 0.0, 0.0),
-        LifNeuron::new(0.0, 0.0, 0.0, 0.0)
-    ])
-    .intraweights(vec![
-        vec![-0.1],
-        vec![-0.2]
-    ]);*/
 
-    /*
-    let snn_builder = Builder::new();
-    let snn = snn_builder.with_input_dimensions(3)
+    let snn2 = SnnBuilder::new()
         .add_layer()
-            .weights(vec![
-                vec![0.1, 0.1, 0.3],
-                vec![0.2, 0.1, 0.3]
+            .weights([
+                [0.1, 0.2, 0.3],
+                [0.2, 0.9, 0.4]
             ])
-            .neurons(vec![
+            .neurons([
                 LifNeuron::new(0.0, 0.0, 0.0, 0.0),
                 LifNeuron::new(0.0, 0.0, 0.0, 0.0)
             ])
-            .intraweights(vec![
-                vec![-0.1],
-                vec![-0.2]
+            .intra_weights([
+                [ 0.0, -0.1],
+                [-0.4,  0.0]
             ])
         .add_layer()
-            .weights(vec![
-                vec![0.1, 0.1, 0.3],
-                vec![0.2, 0.1, 0.3]
+            .weights([
+                [0.1, 0.2],
+                [0.2, 0.9],
+                [0.5, 0.1],
+                [0.9, 0.8]
             ])
-            .neurons(vec![
+            .neurons([
+                LifNeuron::new(0.0, 0.0, 0.0, 0.0),
+                LifNeuron::new(0.0, 0.0, 0.0, 0.0),
                 LifNeuron::new(0.0, 0.0, 0.0, 0.0),
                 LifNeuron::new(0.0, 0.0, 0.0, 0.0)
             ])
-            .intraweights(vec![
-                vec![-0.1],
-                vec![-0.2]
+            .intra_weights([
+                [ 0.0, -0.1, -0.4, -0.8],
+                [-0.4,  0.0, -0.9, -0.3],
+                [-0.2, -0.3,  0.0, -0.2],
+                [-0.3, -0.5, -0.6,  0.0]
             ])
-        .build();*/
+        .build();
 
-    assert_eq!(true, true);
+
+    assert_eq!(snn.s, true);
+    assert_eq!(snn2.s, true);
 }
 
 #[test]

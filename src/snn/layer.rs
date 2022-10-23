@@ -1,5 +1,4 @@
 // * private Layer submodule *
-
 use crate::snn::neuron::Neuron;
 use std::sync::mpsc::{Receiver, Sender};
 use crate::snn::SpikeEvent;

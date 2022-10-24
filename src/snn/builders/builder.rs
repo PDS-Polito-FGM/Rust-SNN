@@ -1,5 +1,6 @@
 // * builder submodule *
 
+use crate::snn::layer::Layer;
 use crate::snn::neuron::Neuron;
 use crate::snn::SNN;
 
@@ -32,19 +33,22 @@ impl<N: Neuron> SnnBuilder<N> {
         }
     }
 
-    pub fn add_layer<const INPUT_DIMENSION: usize>(self) -> WeightsBuilder<N, INPUT_DIMENSION> {
-        WeightsBuilder::<N, INPUT_DIMENSION>::new(self.params)
+    // (the *input dimension* of the network can be automatically inferred by the compiler)
+    pub fn add_layer<const INPUT_DIM: usize>(self) -> WeightsBuilder<N, INPUT_DIM, INPUT_DIM> {
+        WeightsBuilder::<N, INPUT_DIM, INPUT_DIM>::new(self.params)
     }
 }
 
 // ** fluent Builder Pattern structs **
 
 // * Weights *
-pub struct WeightsBuilder<N: Neuron, const INPUT_DIMENSION: usize> {
+/** - INPUT_DIM: is the input dimension of the new layer
+    - NET_INPUT_DIM: is the input dimension of the entire neural network */
+pub struct WeightsBuilder<N: Neuron, const INPUT_DIM: usize, const NET_INPUT_DIM: usize> {
     params: SnnParams<N>
 }
 
-impl<N: Neuron, const INPUT_DIMENSION: usize> WeightsBuilder<N, INPUT_DIMENSION> {
+impl<N: Neuron, const INPUT_DIM: usize, const NET_INPUT_DIM: usize> WeightsBuilder<N, INPUT_DIM, NET_INPUT_DIM> {
     pub fn new(params: SnnParams<N>) -> Self {
         Self { params }
     }
@@ -52,8 +56,8 @@ impl<N: Neuron, const INPUT_DIMENSION: usize> WeightsBuilder<N, INPUT_DIMENSION>
     /** It specifies the weights of the connections between the previous layer and the new one.
         Receives an array for each layer's neuron, containing all the
         ordered weights of the connections between the neuron and its siblings */
-    pub fn weights<const NUM_NEURONS: usize>(mut self, weights: [[f64; INPUT_DIMENSION]; NUM_NEURONS])
-                                         -> NeuronsBuilder<N, NUM_NEURONS> {
+    pub fn weights<const NUM_NEURONS: usize>(mut self, weights: [[f64; INPUT_DIM]; NUM_NEURONS])
+                                         -> NeuronsBuilder<N, NUM_NEURONS, NET_INPUT_DIM> {
         let mut weights_vec : Vec<Vec<f64>> = Vec::new();
 
         // convert the array-like parameter into a Vec
@@ -63,33 +67,34 @@ impl<N: Neuron, const INPUT_DIMENSION: usize> WeightsBuilder<N, INPUT_DIMENSION>
 
         // save layer weights
         self.params.extra_weights.push(weights_vec);
-        NeuronsBuilder::<N, NUM_NEURONS>::new(self.params)
+        NeuronsBuilder::<N, NUM_NEURONS, NET_INPUT_DIM>::new(self.params)
     }
 }
 
 // * Neurons *
-pub struct NeuronsBuilder<N: Neuron, const NUM_NEURONS: usize> {
+pub struct NeuronsBuilder<N: Neuron, const NUM_NEURONS: usize, const NET_INPUT_DIM: usize> {
     params: SnnParams<N>
 }
 
-impl<N: Neuron, const NUM_NEURONS: usize> NeuronsBuilder<N, NUM_NEURONS> {
+impl<N: Neuron, const NUM_NEURONS: usize, const NET_INPUT_DIM: usize> NeuronsBuilder<N, NUM_NEURONS, NET_INPUT_DIM> {
     pub fn new(params: SnnParams<N>) -> Self {
         Self { params }
     }
 
     /** Add an array of (ordered) neurons to the layer */
-    pub fn neurons(mut self, neurons: [N; NUM_NEURONS]) -> IntraWeightsBuilder<N, NUM_NEURONS> {
+    pub fn neurons(mut self, neurons: [N; NUM_NEURONS]) -> IntraWeightsBuilder<N, NUM_NEURONS, NET_INPUT_DIM> {
         self.params.neurons.push(Vec::from(neurons));
-        IntraWeightsBuilder::<N, NUM_NEURONS>::new(self.params)
+        IntraWeightsBuilder::<N, NUM_NEURONS, NET_INPUT_DIM>::new(self.params)
     }
 }
 
 // * Intra Weights *
-pub struct IntraWeightsBuilder<N: Neuron, const NUM_NEURONS: usize> {
+pub struct IntraWeightsBuilder<N: Neuron, const NUM_NEURONS: usize, const NET_INPUT_DIM: usize> {
     params: SnnParams<N>
 }
 
-impl<N: Neuron, const NUM_NEURONS: usize> IntraWeightsBuilder<N, NUM_NEURONS> {
+impl<N: Neuron, const NUM_NEURONS: usize, const NET_INPUT_DIM: usize>
+    IntraWeightsBuilder<N, NUM_NEURONS, NET_INPUT_DIM> {
     pub fn new(params: SnnParams<N>) -> Self {
         Self { params }
     }
@@ -102,7 +107,7 @@ impl<N: Neuron, const NUM_NEURONS: usize> IntraWeightsBuilder<N, NUM_NEURONS> {
         [[0, -0.1, -0.3], [-0.2, 0, -0.7], [-0.9, -0.4, 0]]. The y_th element in the x_th array represent the
         weight of the link from the neuron X to the neuron Y. */
     pub fn intra_weights(mut self, intra_weights: [[f64; NUM_NEURONS]; NUM_NEURONS])
-                    -> LayerBuilder<N, NUM_NEURONS> {
+                    -> LayerBuilder<N, NUM_NEURONS, NET_INPUT_DIM> {
         let mut intra_weights_vec : Vec<Vec<f64>> = Vec::new();
 
         // convert array-like intra weights parameter into a Vec
@@ -112,28 +117,50 @@ impl<N: Neuron, const NUM_NEURONS: usize> IntraWeightsBuilder<N, NUM_NEURONS> {
 
         // save layer intra weights
         self.params.intra_weights.push(intra_weights_vec);
-        LayerBuilder::<N, NUM_NEURONS>::new(self.params)
+        LayerBuilder::<N, NUM_NEURONS, NET_INPUT_DIM>::new(self.params)
     }
 }
 
 // * Layer *
 /** It allows to add a new layer, or to build and get the SNN with the characteristics defined so far */
-pub struct LayerBuilder<N: Neuron, const OUTPUT_DIMENSION: usize> {
+pub struct LayerBuilder<N: Neuron, const OUTPUT_DIM: usize, const NET_INPUT_DIM: usize> {
     params: SnnParams<N>
 }
 
-impl<N: Neuron, const OUTPUT_DIMENSION: usize> LayerBuilder<N, OUTPUT_DIMENSION> {
+impl<N: Neuron, const OUTPUT_DIM: usize, const NET_INPUT_DIM: usize> LayerBuilder<N, OUTPUT_DIM, NET_INPUT_DIM> {
     pub fn new(params: SnnParams<N>) -> Self {
         Self { params }
     }
 
     /** Create and initialize the whole Spiking Neural Network with the characteristics defined so far */
-    pub fn build(self) -> SNN<N> {
-        SNN::<N>::new(true)
+    pub fn build(self) -> SNN<N, NET_INPUT_DIM, OUTPUT_DIM> {
+        if  self.params.neurons.len() != self.params.extra_weights.len() &&
+            self.params.neurons.len() != self.params.intra_weights.len() {
+            // it must not happen
+            panic!("Error: the number of neurons layers does not correspond to the number of weights layers")
+        }
+
+        let mut layers: Vec<Layer<N>> = Vec::new();
+
+        let mut neurons_iter = self.params.neurons.into_iter();
+        let mut extra_weigths_iter = self.params.extra_weights.into_iter();
+        let mut intra_weights_iter = self.params.intra_weights.into_iter();
+
+        // * retrieve the Neurons, the extra weights and the intra weights for each layer *
+        while let Some(layer_neurons) = neurons_iter.next() {
+            let layer_extra_weights = extra_weigths_iter.next().unwrap();
+            let layer_intra_weights = intra_weights_iter.next().unwrap();
+
+            // create and save the new layer
+            let new_layer = Layer::new(layer_neurons, layer_extra_weights, layer_intra_weights);
+            layers.push(new_layer);
+        }
+
+        SNN::<N, NET_INPUT_DIM, OUTPUT_DIM>::new(layers)
     }
 
     /** Add a new layer to the SNN */
-    pub fn add_layer(self) -> WeightsBuilder<N, OUTPUT_DIMENSION> {
-        WeightsBuilder::<N, OUTPUT_DIMENSION>::new(self.params)
+    pub fn add_layer(self) -> WeightsBuilder<N, OUTPUT_DIM, NET_INPUT_DIM> {
+        WeightsBuilder::<N, OUTPUT_DIM, NET_INPUT_DIM>::new(self.params)
     }
 }

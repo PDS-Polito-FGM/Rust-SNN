@@ -6,7 +6,7 @@ use crate::snn::SNN;
 
 
 /** Object containing the configuration parameters describing the SNN architecture */
-pub struct SnnParams<N: Neuron> {
+pub struct SnnParams<N: Neuron+'static> {
     pub input_dimensions: usize,            /* dimension of the network input layer */
     pub neurons: Vec<Vec<N>>,               /* neurons per each layer */
     pub extra_weights: Vec<Vec<Vec<f64>>>,  /* (positive) weights between layers */
@@ -17,11 +17,11 @@ pub struct SnnParams<N: Neuron> {
     It allows to configure the network step-by-step, adding one layer at a time,
     specifying the (extra)weights the neurons and the intra weights for each layer.
     - It follows the (fluent) Builder design pattern. */
-pub struct SnnBuilder<N: Neuron> {
+pub struct SnnBuilder<N: Neuron+'static> {
     params: SnnParams<N>
 }
 
-impl<N: Neuron> SnnBuilder<N> {
+impl<N: Neuron+'static> SnnBuilder<N> {
     pub fn new() -> Self {
         Self {
             params: SnnParams {
@@ -44,11 +44,12 @@ impl<N: Neuron> SnnBuilder<N> {
 // * Weights *
 /** - INPUT_DIM: is the input dimension of the new layer
     - NET_INPUT_DIM: is the input dimension of the entire neural network */
-pub struct WeightsBuilder<N: Neuron, const INPUT_DIM: usize, const NET_INPUT_DIM: usize> {
+pub struct WeightsBuilder<N: Neuron+'static, const INPUT_DIM: usize, const NET_INPUT_DIM: usize> {
     params: SnnParams<N>
 }
 
-impl<N: Neuron, const INPUT_DIM: usize, const NET_INPUT_DIM: usize> WeightsBuilder<N, INPUT_DIM, NET_INPUT_DIM> {
+impl<N: Neuron+'static, const INPUT_DIM: usize, const NET_INPUT_DIM: usize>
+    WeightsBuilder<N, INPUT_DIM, NET_INPUT_DIM> {
     pub fn new(params: SnnParams<N>) -> Self {
         Self { params }
     }
@@ -72,11 +73,12 @@ impl<N: Neuron, const INPUT_DIM: usize, const NET_INPUT_DIM: usize> WeightsBuild
 }
 
 // * Neurons *
-pub struct NeuronsBuilder<N: Neuron, const NUM_NEURONS: usize, const NET_INPUT_DIM: usize> {
+pub struct NeuronsBuilder<N: Neuron+'static, const NUM_NEURONS: usize, const NET_INPUT_DIM: usize> {
     params: SnnParams<N>
 }
 
-impl<N: Neuron, const NUM_NEURONS: usize, const NET_INPUT_DIM: usize> NeuronsBuilder<N, NUM_NEURONS, NET_INPUT_DIM> {
+impl<N: Neuron+'static, const NUM_NEURONS: usize, const NET_INPUT_DIM: usize>
+    NeuronsBuilder<N, NUM_NEURONS, NET_INPUT_DIM> {
     pub fn new(params: SnnParams<N>) -> Self {
         Self { params }
     }
@@ -89,11 +91,11 @@ impl<N: Neuron, const NUM_NEURONS: usize, const NET_INPUT_DIM: usize> NeuronsBui
 }
 
 // * Intra Weights *
-pub struct IntraWeightsBuilder<N: Neuron, const NUM_NEURONS: usize, const NET_INPUT_DIM: usize> {
+pub struct IntraWeightsBuilder<N: Neuron+'static, const NUM_NEURONS: usize, const NET_INPUT_DIM: usize> {
     params: SnnParams<N>
 }
 
-impl<N: Neuron, const NUM_NEURONS: usize, const NET_INPUT_DIM: usize>
+impl<N: Neuron+'static, const NUM_NEURONS: usize, const NET_INPUT_DIM: usize>
     IntraWeightsBuilder<N, NUM_NEURONS, NET_INPUT_DIM> {
     pub fn new(params: SnnParams<N>) -> Self {
         Self { params }
@@ -123,11 +125,12 @@ impl<N: Neuron, const NUM_NEURONS: usize, const NET_INPUT_DIM: usize>
 
 // * Layer *
 /** It allows to add a new layer, or to build and get the SNN with the characteristics defined so far */
-pub struct LayerBuilder<N: Neuron, const OUTPUT_DIM: usize, const NET_INPUT_DIM: usize> {
+pub struct LayerBuilder<N: Neuron+'static, const OUTPUT_DIM: usize, const NET_INPUT_DIM: usize> {
     params: SnnParams<N>
 }
 
-impl<N: Neuron, const OUTPUT_DIM: usize, const NET_INPUT_DIM: usize> LayerBuilder<N, OUTPUT_DIM, NET_INPUT_DIM> {
+impl<N: Neuron+'static, const OUTPUT_DIM: usize, const NET_INPUT_DIM: usize>
+    LayerBuilder<N, OUTPUT_DIM, NET_INPUT_DIM> {
     pub fn new(params: SnnParams<N>) -> Self {
         Self { params }
     }

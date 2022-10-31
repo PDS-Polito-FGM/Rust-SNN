@@ -5,14 +5,15 @@ use crate::snn::SpikeEvent;
 
 
 /* Object representing a Layer of the Spiking Neural Network */
-pub struct Layer<N: Neuron> {
+pub struct Layer<N: Neuron+'static> {
     _neurons: Vec<N>,
     _weights: Vec<Vec<f64>>,
     _intra_weights: Vec<Vec<f64>>
     // TODO Note: I removed the tx and rc from here as well for the same reasons of the SNN - Mario
 }
 
-impl<N: Neuron> Layer<N> {
+
+impl<N: Neuron+'static> Layer<N> {
     pub fn new(
         _neurons: Vec<N>,
         _weights: Vec<Vec<f64>>,
@@ -42,3 +43,5 @@ impl<N: Neuron> Layer<N> {
         // TODO: send output to the next layer
     }
 }
+
+unsafe impl<N: Neuron> Sync for Layer<N> {}

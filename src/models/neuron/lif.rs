@@ -52,3 +52,5 @@ impl Neuron for LifNeuron {
         };
     }
 }
+
+unsafe impl Send for LifNeuron {}

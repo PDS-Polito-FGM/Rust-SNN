@@ -113,6 +113,7 @@ impl<N: Neuron + Send + 'static, const NUM_NEURONS: usize, const NET_INPUT_DIM: 
         (it could be set to 0). Eg: in a layer with 3 neurons, an example of intra weights matrix could be:
         [[0, -0.1, -0.3], [-0.2, 0, -0.7], [-0.9, -0.4, 0]]. The y_th element in the x_th array represent the
         weight of the link from the neuron Y to the neuron X. */
+        
     pub fn intra_weights(mut self, intra_weights: [[f64; NUM_NEURONS]; NUM_NEURONS])
                     -> LayerBuilder<N, NUM_NEURONS, NET_INPUT_DIM> {
         let mut intra_weights_vec : Vec<Vec<f64>> = Vec::new();

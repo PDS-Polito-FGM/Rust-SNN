@@ -5,6 +5,7 @@ use crate::snn::neuron::Neuron;
 /**
     Object representing a Neuron in the LIF (Leaky Integrate-and-Fire) model
 */
+#[derive(Debug)]
 pub struct LifNeuron {
     v_th: f64,
     v_rest: f64,
@@ -29,24 +30,26 @@ impl LifNeuron {
 
 impl Neuron for LifNeuron {
     fn compute_v_mem(&mut self, t: u64, extra_weighted_sum: f64, intra_weighted_sum: f64) -> u8 {
-        // * compute the neuron membran potential with the LIF formula *
+        // * compute the neuron membrane potential with the LIF formula *
         let exponent = -(((t - self.ts_prev) as f64) / self.tau);
         let weighted_sum = extra_weighted_sum + intra_weighted_sum;
         let v_mem =
             self.v_rest + (self.v_mem_ts_prev - self.v_rest) * exponent.exp() + weighted_sum;
 
-        // check if the neuron has receceived at least 1 spike from the previous layer
+        // check if the neuron has received at least 1 spike from the previous layer
         // if so, *update ts_prev*
         if extra_weighted_sum > (0 as f64) {
             self.ts_prev = t;
         }
 
+        //TODO: if the neuron fires, we have to decrement all the other intra weights of the other neurons in the same layer
+
         return if v_mem > self.v_th {
-            // reset membran potential
+            // reset membrane potential
             self.v_mem_ts_prev = self.v_reset;
             1 // * fire *
         } else {
-            // save membran potential for later
+            // save membrane potential for later
             self.v_mem_ts_prev = v_mem;
             0
         };

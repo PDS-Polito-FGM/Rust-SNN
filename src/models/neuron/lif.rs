@@ -5,6 +5,7 @@ use crate::snn::neuron::Neuron;
 /**
     Object representing a Neuron in the LIF (Leaky Integrate-and-Fire) model
 */
+#[derive(Debug)]
 pub struct LifNeuron {
     v_th: f64,
     v_rest: f64,
@@ -41,6 +42,8 @@ impl Neuron for LifNeuron {
             self.ts_prev = t;
         }
 
+        //TODO: if the neuron fires, we have to decrement all the other intra weights of the other neurons in the same layer
+
         return if v_mem > self.v_th {
             // reset membrane potential
             self.v_mem_ts_prev = self.v_reset;
@@ -52,3 +55,5 @@ impl Neuron for LifNeuron {
         };
     }
 }
+
+unsafe impl Send for LifNeuron {}

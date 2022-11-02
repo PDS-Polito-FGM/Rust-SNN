@@ -92,8 +92,6 @@ impl<N: Neuron + Send + 'static, const NET_INPUT_DIM: usize, const NET_OUTPUT_DI
             output_events.push(spike_event);
         }
 
-        //TODO: check if the lines of code below are useful or it is enough to wait the spike events from each thread - Francesco
-
         // waiting for threads to terminate
         for thread in threads {
             thread.join().unwrap();

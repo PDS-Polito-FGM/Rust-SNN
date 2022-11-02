@@ -7,7 +7,7 @@ fn fake_test1() {
 
     let builder = SnnBuilder::new();
 
-    let _snn = builder
+    let mut snn = builder
         .add_layer()
             .weights([
                 [0.1, 0.1, 0.3],
@@ -73,6 +73,9 @@ fn fake_test1() {
                 [-0.3, -0.5, -0.6,  0.0]
             ])
         .build();
+
+    //let _output_spikes = snn.process(&[[0,1,1],[1,1,1],[0,0,1]]);
+    //TODO: manage the lifetimes problem
 
     assert_eq!(true, true);
 }

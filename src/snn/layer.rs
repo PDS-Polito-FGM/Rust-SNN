@@ -81,10 +81,7 @@ impl<N: Neuron + Send + 'static> Layer<N> {
             self.prev_output_spikes = output_spikes;
         }
 
-        //TODO: we have to decide if we want to leave the drop below as it is because as the thread terminates,
-        // the associated structures (Sender and Receiver, ...) would be released in any case - Francesco
-
-        drop(layer_output_tx);  // * dropping the sender of the next layer, to let the next threads (layers) terminate *
+        // we don't need to drop the sender, because it will be dropped automatically when the layer goes out of scope
 
     }
 }

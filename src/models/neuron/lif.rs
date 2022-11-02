@@ -22,7 +22,7 @@ impl LifNeuron {
             v_rest,
             v_reset,
             tau,
-            v_mem_ts_prev: 0f64,
+            v_mem_ts_prev: 0f64,    //TODO: we have to decide how to initialize this value - Francesco
             ts_prev: 0u64,
         }
     }
@@ -42,7 +42,7 @@ impl Neuron for LifNeuron {
             self.ts_prev = t;
         }
 
-        //TODO: if the neuron fires, we have to decrement all the other intra weights of the other neurons in the same layer
+        //TODO: if the neuron fires, we have to decrement all the other intra weights of the other neurons in the same layer - Francesco
 
         return if v_mem > self.v_th {
             // reset membrane potential

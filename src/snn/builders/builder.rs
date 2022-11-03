@@ -66,6 +66,8 @@ impl<N: Neuron + Send + 'static, const INPUT_DIM: usize, const NET_INPUT_DIM: us
 
         // convert the array-like parameter into a Vec
         for neuron_weights in &weights {
+            neuron_weights.iter().for_each(|w| if w<&0f64 || w>&1f64
+            { panic!("The weights must be included between 0 and 1!"); });
             weights_vec.push(Vec::from(neuron_weights.as_slice()));
         }
 
@@ -120,6 +122,8 @@ impl<N: Neuron + Send + 'static, const NUM_NEURONS: usize, const NET_INPUT_DIM: 
 
         // convert array-like intra weights parameter into a Vec
         for neuron_intra_weights in &intra_weights {
+            neuron_intra_weights.iter().for_each(|w| if w>&0f64 || w<&-1f64
+            { panic!("The intra weights must be negative and included between -1 and 0!"); });
             intra_weights_vec.push(Vec::from(neuron_intra_weights.as_slice()));
         }
 

@@ -143,7 +143,7 @@ impl<N: Neuron + Send + 'static, const OUTPUT_DIM: usize, const NET_INPUT_DIM: u
     }
 
     /** Create and initialize the whole Spiking Neural Network with the characteristics defined so far */
-    pub fn build(self) -> SNN<N, NET_INPUT_DIM, OUTPUT_DIM> {
+    pub fn build(self) -> &'static mut SNN<N, { NET_INPUT_DIM }, { OUTPUT_DIM }> {
         if  self.params.neurons.len() != self.params.extra_weights.len() &&
             self.params.neurons.len() != self.params.intra_weights.len() {
             // it must not happen
@@ -169,7 +169,15 @@ impl<N: Neuron + Send + 'static, const OUTPUT_DIM: usize, const NET_INPUT_DIM: u
             layers.push(new_layer);
         }
 
-        SNN::<N, NET_INPUT_DIM, OUTPUT_DIM>::new(layers)
+        /*
+            By including the whole SNN network into the Box smart pointer, we can create a static network
+            that will be never deallocated, so we are granting the right lifetime of the network among the
+            threads
+        */
+
+        let box_snn = Box::new(SNN::<N, NET_INPUT_DIM, OUTPUT_DIM>::new(layers));
+
+        Box::leak(box_snn)
     }
 
     /** Add a new layer to the SNN */

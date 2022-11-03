@@ -5,7 +5,7 @@ use pds_snn::models::neuron::lif::LifNeuron;
 fn fake_test1() {
     println!("This is a fake test to check the Fluent Builder pattern");
 
-    let snn = Box::new(SnnBuilder::new()
+    let snn = SnnBuilder::new()
         .add_layer()
             .weights([
                 [0.1, 0.1, 0.3],
@@ -35,20 +35,12 @@ fn fake_test1() {
                 [-0.2,  0.0, -0.5],
                 [-0.1, -0.9,  0.0]
             ])
-        .build());
+        .build();
 
     // printing the SNN network just built
     println!("This is the SNN network built: \n{:?}\n", snn);
 
-    let static_snn= Box::leak(snn);
-
-    /*
-       By including the whole SNN network into the Box smart pointer, we can create a static network
-       that will be never deallocated, so we are granting the right lifetime of the network among the
-       threads
-    */
-
-    let _output_spikes = static_snn.process(&[[0,1,1],[1,1,1],[0,0,1]]);
+    let _output_spikes = snn.process(&[[0,1,1],[1,1,1],[0,0,1]]);
 
     let _snn2 = SnnBuilder::new()
         .add_layer()

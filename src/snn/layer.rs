@@ -39,7 +39,7 @@ impl<N: Neuron + Send + 'static> Layer<N> {
 
         while let Ok(input_spike_event) = layer_input_rc.recv() {
 
-            let current_instant = input_spike_event.ts;
+            let instant = input_spike_event.ts;
             let mut output_spikes = Vec::<u8>::with_capacity(self.neurons.len());
 
             // * computing for each neuron the intra and extra weighted sums, retrieving also their output spikes *
@@ -69,14 +69,14 @@ impl<N: Neuron + Send + 'static> Layer<N> {
                     }
                 }
 
-                let neuron_spike = neuron.compute_v_mem(current_instant,extra_weighted_sum,intra_weighted_sum);
+                let neuron_spike = neuron.compute_v_mem(instant,extra_weighted_sum,intra_weighted_sum);
                 output_spikes.push(neuron_spike);
             }
 
-            let output_spike_event = SpikeEvent::new(current_instant+1,output_spikes.clone());
+            let output_spike_event = SpikeEvent::new(instant,output_spikes.clone());
 
             layer_output_tx.send(output_spike_event)
-                .expect(&format!("Unexpected error sending input spike event t={}", current_instant+1));
+                .expect(&format!("Unexpected error sending input spike event t={}", instant));
 
             self.prev_output_spikes = output_spikes;
         }

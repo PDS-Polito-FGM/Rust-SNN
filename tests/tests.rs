@@ -40,7 +40,16 @@ fn fake_test1() {
     // printing the SNN network just built
     println!("This is the SNN network built: \n{:?}\n", snn);
 
-    let _output_spikes = snn.process(&[[0,1,1],[1,1,1],[0,0,1]]);
+    let output_spikes = snn.process(&[[0,1,1],[1,1,1],[0,0,1]]);
+
+    println!("\nOUTPUT SPIKES\n");
+
+    for spikes in output_spikes.to_vec() {
+        for spike in spikes.to_vec() {
+            print!("{} ",spike);
+        }
+        println!();
+    }
 
     let _snn2 = SnnBuilder::new()
         .add_layer()

@@ -5,7 +5,7 @@ use pds_snn::models::neuron::lif::LifNeuron;
 fn fluent_builder_test1() {
     println!("This is the first test useful to check the Fluent Builder pattern");
 
-    let snn = SnnBuilder::new()
+    let mut snn = SnnBuilder::new()
         .add_layer()
             .weights([
                 [0.1, 0.1, 0.3],
@@ -60,7 +60,7 @@ fn fluent_builder_test1() {
 fn fluent_builder_test2() {
     println!("This is the second test useful to check the Fluent Builder pattern");
 
-    let snn = SnnBuilder::new()
+    let mut snn = SnnBuilder::new()
         .add_layer()
         .weights([
             [0.1, 0.2, 0.3],

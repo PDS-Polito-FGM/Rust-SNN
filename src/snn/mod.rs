@@ -18,21 +18,14 @@ pub mod neuron;
     the size of the input provided by the user
 */
 #[derive(Debug)]
-pub struct SNN<N: Neuron + Send + 'static, const NET_INPUT_DIM: usize, const NET_OUTPUT_DIM: usize> {
-    layers: Vec<Layer<N>>
-    // TODO Note: I removed tx and rc because it is better to create them on the fly before processing
-    //            the input, as well as all the others tx(s) and rc(s) for the layers. In this way, they will be
-    //            dropped as soon as they are not needed anymore (after processing the input), instead of keeping
-    //            them as fixed struct fields even when the computation is done
-    //            Furthermore, it simplifies the layer.process() method, because in this way the tx(s) are dropped
-    //            as soon as the input is processed, and this causes the correspondent rc(s) to stop waiting in
-    //            the next layer, leading that layer's thread to return - Mario
+pub struct SNN<N: Neuron + Clone + Send + 'static, const NET_INPUT_DIM: usize, const NET_OUTPUT_DIM: usize> {
+    layers: Vec<Box<Layer<N>>>
 }
 
-impl<N: Neuron + Send + 'static, const NET_INPUT_DIM: usize, const NET_OUTPUT_DIM: usize>
+impl<N: Neuron + Clone + Send + 'static, const NET_INPUT_DIM: usize, const NET_OUTPUT_DIM: usize>
     SNN<N, NET_INPUT_DIM, NET_OUTPUT_DIM> {
     // test
-    pub fn new(layers: Vec<Layer<N>>) -> Self {
+    pub fn new(layers: Vec<Box<Layer<N>>>) -> Self {
         Self { layers }
     }
 
@@ -40,8 +33,7 @@ impl<N: Neuron + Send + 'static, const NET_INPUT_DIM: usize, const NET_OUTPUT_DI
     // number of spikes, equal to the duration of the input
     // (spikes is a matrix, one row for each input neuron, and one column for each time instant)
     // * this method is able to check user input at compile-time *
-    // TODO Note: I don't know if these are the best input and output for this method, let's think about that - Mario
-    pub fn process<const SPIKES_DURATION: usize> (&'static mut self, spikes: &[[u8; SPIKES_DURATION]; NET_INPUT_DIM])
+    pub fn process<const SPIKES_DURATION: usize> (&mut self, spikes: &[[u8; SPIKES_DURATION]; NET_INPUT_DIM])
         -> [[u8; SPIKES_DURATION]; NET_OUTPUT_DIM] {
         // * encode spikes into SpikeEvent(s) *
         let input_spike_events = SNN::<N, NET_INPUT_DIM, NET_OUTPUT_DIM>::encode_spikes(spikes);
@@ -56,7 +48,7 @@ impl<N: Neuron + Send + 'static, const NET_INPUT_DIM: usize, const NET_OUTPUT_DI
         decoded_output
     }
 
-    fn process_events(&'static mut self, spikes: Vec<SpikeEvent>) -> Vec<SpikeEvent> {
+    fn process_events(&mut self, spikes: Vec<SpikeEvent>) -> Vec<SpikeEvent> {
 
         // create the threads' pool
         let mut threads = Vec::new();
@@ -67,12 +59,15 @@ impl<N: Neuron + Send + 'static, const NET_INPUT_DIM: usize, const NET_OUTPUT_DI
         for layer in &mut self.layers {
             let (layer_tx, next_layer_rc) = channel::<SpikeEvent>();
 
+            let static_layer = Box::leak(layer.clone());
+
             let thread = thread::spawn(move || {
-                layer.process(layer_rc, layer_tx);
+                static_layer.process(layer_rc, layer_tx);
             });
 
-            layer_rc = next_layer_rc; // update external rc, to pass it to the next layer
             threads.push(thread);   // push the new thread into threads' pool
+            layer_rc = next_layer_rc; // update external rc, to pass it to the next layer
+
         }
 
         let net_output_rc = layer_rc;

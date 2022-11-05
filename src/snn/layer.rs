@@ -7,7 +7,7 @@ use crate::snn::SpikeEvent;
 
 /* Object representing a Layer of the Spiking Neural Network */
 #[derive(Debug)]
-pub struct Layer<N: Neuron + Send + 'static> {
+pub struct Layer<N: Neuron + Clone + Send + 'static> {
     neurons: Vec<N>,
     weights: Vec<Vec<f64>>,
     intra_weights: Vec<Vec<f64>>,
@@ -15,7 +15,7 @@ pub struct Layer<N: Neuron + Send + 'static> {
 }
 
 
-impl<N: Neuron + Send + 'static> Layer<N> {
+impl<N: Neuron + Clone + Send + 'static> Layer<N> {
     pub fn new(
         neurons: Vec<N>,
         weights: Vec<Vec<f64>>,
@@ -86,4 +86,15 @@ impl<N: Neuron + Send + 'static> Layer<N> {
     }
 }
 
-unsafe impl<N: Neuron> Sync for Layer<N> {}
+unsafe impl<N: Neuron + Clone> Sync for Layer<N> {}
+
+impl<N: Neuron + Clone + Send + 'static> Clone for Layer<N> {
+    fn clone(&self) -> Self {
+        Self {
+            neurons: self.neurons.clone(),
+            weights: self.weights.clone(),
+            intra_weights: self.intra_weights.clone(),
+            prev_output_spikes: self.prev_output_spikes.clone()
+        }
+    }
+}

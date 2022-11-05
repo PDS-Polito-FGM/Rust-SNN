@@ -22,7 +22,7 @@ impl LifNeuron {
             v_rest,
             v_reset,
             tau,
-            v_mem_ts_prev: 0f64,    //TODO: we have to decide how to initialize this value - Francesco
+            v_mem_ts_prev: 0f64,    // TODO: we have to decide how to initialize this value - Francesco
             ts_prev: 0u64,
         }
     }
@@ -53,6 +53,19 @@ impl Neuron for LifNeuron {
             self.v_mem_ts_prev = v_mem;
             0
         };
+    }
+}
+
+impl Clone for LifNeuron {
+    fn clone(&self) -> Self {
+        Self {
+            v_th: self.v_th,
+            v_rest: self.v_rest,
+            v_reset: self.v_reset,
+            tau: self.tau,
+            v_mem_ts_prev: self.v_mem_ts_prev,
+            ts_prev: self.ts_prev
+        }
     }
 }
 

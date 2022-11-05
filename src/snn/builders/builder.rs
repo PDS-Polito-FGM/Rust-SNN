@@ -154,7 +154,7 @@ impl<N: Neuron + Clone + Send + 'static, const OUTPUT_DIM: usize, const NET_INPU
             panic!("Error: the number of neurons layers does not correspond to the number of weights layers")
         }
 
-        let mut layers: Vec<Box<Layer<N>>> = Vec::new();
+        let mut layers: Vec<Layer<N>> = Vec::new();
 
         let mut neurons_iter = self.params.neurons.into_iter();
         let mut extra_weights_iter = self.params.extra_weights.into_iter();
@@ -167,7 +167,7 @@ impl<N: Neuron + Clone + Send + 'static, const OUTPUT_DIM: usize, const NET_INPU
 
             // create and save the new layer
             let new_layer = Layer::new(layer_neurons, layer_extra_weights, layer_intra_weights);
-            layers.push(Box::new(new_layer));
+            layers.push(new_layer);
         }
 
         /*

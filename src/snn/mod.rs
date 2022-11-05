@@ -19,13 +19,13 @@ pub mod neuron;
 */
 #[derive(Debug)]
 pub struct SNN<N: Neuron + Clone + Send + 'static, const NET_INPUT_DIM: usize, const NET_OUTPUT_DIM: usize> {
-    layers: Vec<Box<Layer<N>>>
+    layers: Vec<Layer<N>>
 }
 
 impl<N: Neuron + Clone + Send + 'static, const NET_INPUT_DIM: usize, const NET_OUTPUT_DIM: usize>
     SNN<N, NET_INPUT_DIM, NET_OUTPUT_DIM> {
     // test
-    pub fn new(layers: Vec<Box<Layer<N>>>) -> Self {
+    pub fn new(layers: Vec<Layer<N>>) -> Self {
         Self { layers }
     }
 
@@ -59,7 +59,7 @@ impl<N: Neuron + Clone + Send + 'static, const NET_INPUT_DIM: usize, const NET_O
         for layer in &mut self.layers {
             let (layer_tx, next_layer_rc) = channel::<SpikeEvent>();
 
-            let static_layer = Box::leak(layer.clone());
+            let static_layer = Box::leak(Box::new(layer.clone()));
 
             let thread = thread::spawn(move || {
                 static_layer.process(layer_rc, layer_tx);

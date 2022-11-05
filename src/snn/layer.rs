@@ -19,14 +19,14 @@ impl<N: Neuron + Clone + Send + 'static> Layer<N> {
     pub fn new(
         neurons: Vec<N>,
         weights: Vec<Vec<f64>>,
-        intra_weights: Vec<Vec<f64>>,
-        prev_output_spikes: Vec<u8>
+        intra_weights: Vec<Vec<f64>>
     ) -> Self {
+        let num_neurons = neurons.len();
         Self {
             neurons,
             weights,
             intra_weights,
-            prev_output_spikes
+            prev_output_spikes: vec![0; num_neurons]
         }
     }
 

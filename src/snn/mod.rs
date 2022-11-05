@@ -172,9 +172,9 @@ impl<N: Neuron + Clone + Send + 'static, const NET_INPUT_DIM: usize, const NET_O
 
             // retrieve the input spikes for each neuron
             for in_neuron_index in 0..NET_INPUT_DIM {
-               if spikes[in_neuron_index][t] !=0 && spikes[in_neuron_index][t] != 1 {
-                   panic!("Error: input spikes must be 0 or 1 in position ({}, {})", in_neuron_index, t);
-               }
+                if spikes[in_neuron_index][t] != 0 && spikes[in_neuron_index][t] != 1 {
+                    panic!("Error: input spikes must be 0 or 1 in position ({}, {})", in_neuron_index, t);
+                }
                 t_spikes.push(spikes[in_neuron_index][t]);
             }
 

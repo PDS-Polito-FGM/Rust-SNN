@@ -66,7 +66,7 @@ impl<N: Neuron + Clone + Send + 'static, const INPUT_DIM: usize, const NET_INPUT
 
         // convert the array-like parameter into a Vec
         for neuron_weights in &weights {
-            neuron_weights.iter().for_each(|w| if w<&0f64 || w>&1f64
+            neuron_weights.iter().for_each(|w| if w < &0f64 || w > &1f64
             { panic!("The weights must be included between 0 and 1!"); });
             weights_vec.push(Vec::from(neuron_weights.as_slice()));
         }
@@ -164,12 +164,9 @@ impl<N: Neuron + Clone + Send + 'static, const OUTPUT_DIM: usize, const NET_INPU
         while let Some(layer_neurons) = neurons_iter.next() {
             let layer_extra_weights = extra_weights_iter.next().unwrap();
             let layer_intra_weights = intra_weights_iter.next().unwrap();
-            let num_neurons = layer_neurons.len();
-
-            // TODO: we have to decide if the first prev_output_spikes must have all zeros or not - Francesco
 
             // create and save the new layer
-            let new_layer = Layer::new(layer_neurons, layer_extra_weights, layer_intra_weights,vec![0; num_neurons]);
+            let new_layer = Layer::new(layer_neurons, layer_extra_weights, layer_intra_weights);
             layers.push(Box::new(new_layer));
         }
 

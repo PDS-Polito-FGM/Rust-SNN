@@ -49,7 +49,6 @@ impl<N: Neuron + Clone + Send + 'static, const NET_INPUT_DIM: usize, const NET_O
     }
 
     fn process_events(&mut self, spikes: Vec<SpikeEvent>) -> Vec<SpikeEvent> {
-
         // create the threads' pool
         let mut threads = Vec::new();
 
@@ -66,8 +65,7 @@ impl<N: Neuron + Clone + Send + 'static, const NET_INPUT_DIM: usize, const NET_O
             });
 
             threads.push(thread);   // push the new thread into threads' pool
-            layer_rc = next_layer_rc; // update external rc, to pass it to the next layer
-
+            layer_rc = next_layer_rc;    // update external rc, to pass it to the next layer
         }
 
         let net_output_rc = layer_rc;
@@ -98,7 +96,7 @@ impl<N: Neuron + Clone + Send + 'static, const NET_INPUT_DIM: usize, const NET_O
     // (same as process(), but it checks input spikes sizes at *run-time*:
     // spikes must have a number of Vec(s) equal to NET_INPUT_DIM, and all
     // these Vec(s) must have the same length), otherwise panic!()
-    fn _process_dyn(&'static mut self, spikes: Vec<Vec<u8>>) -> Vec<Vec<u8>> {
+    fn _process_dyn(&mut self, spikes: Vec<Vec<u8>>) -> Vec<Vec<u8>> {
         // check num of spikes vec(s)
         if spikes.len() != NET_INPUT_DIM {
             panic!("Error: dimensions mismatch - each input layer's neuron must have its own spikes vec");
@@ -109,7 +107,7 @@ impl<N: Neuron + Clone + Send + 'static, const NET_INPUT_DIM: usize, const NET_O
         let mut spikes_events = Vec::<SpikeEvent>::new();
         let mut spikes_duration: Option<usize> = None;
 
-        for neuron_spikes in spikes {
+        for (n, neuron_spikes) in spikes.into_iter().enumerate() {
             let temp_len = neuron_spikes.len();
 
             // check spikes durations - they must have all the same size
@@ -131,10 +129,16 @@ impl<N: Neuron + Clone + Send + 'static, const NET_INPUT_DIM: usize, const NET_O
 
             // copy each spike in the spike_events vec
             for t in 0..spikes_duration.unwrap() {
-                spikes_events[t].spikes.push(neuron_spikes[t]);
+                let temp_spike = neuron_spikes[t];
+                if temp_spike != 0 && temp_spike != 1 {
+                    panic!("Error: input spike must be 0 or 1 for neuron {} in t={}", n, t);
+                }
+
+                spikes_events[t].spikes.push(temp_spike);
             }
         }
 
+        // * run SNN *
         let output_spike_events = self.process_events(spikes_events);
 
         // * decode output spikes in spike events *
@@ -143,19 +147,16 @@ impl<N: Neuron + Clone + Send + 'static, const NET_INPUT_DIM: usize, const NET_O
         let mut output_spikes: Vec<Vec<u8>> = Vec::new();
 
         for _ in &output_spike_events.get(0)
-                                        .unwrap_or(&SpikeEvent::new(0, Vec::<u8>::new()))
-                                        .spikes {
-            // create as many internal Vec<u8> as the time duration of the first spike_event
+                                     .unwrap_or(&SpikeEvent::new(0, Vec::<u8>::new()))
+                                     .spikes {
+            // create as many internal Vec<u8> as the length of the first output spike_event (num of output neurons)
             output_spikes.push(Vec::<u8>::new());
         }
 
-        let mut out_neuron_index;
         // copy processed spikes in the output spikes vec
         for spike_event in output_spike_events {
-            out_neuron_index = 0;
-            for spike in spike_event.spikes {
+            for (out_neuron_index, spike) in spike_event.spikes.into_iter().enumerate() {
                 output_spikes[out_neuron_index].push(spike);
-                out_neuron_index += 1;
             }
         }
 
@@ -173,7 +174,7 @@ impl<N: Neuron + Clone + Send + 'static, const NET_INPUT_DIM: usize, const NET_O
             // retrieve the input spikes for each neuron
             for in_neuron_index in 0..NET_INPUT_DIM {
                 if spikes[in_neuron_index][t] != 0 && spikes[in_neuron_index][t] != 1 {
-                    panic!("Error: input spikes must be 0 or 1 in position ({}, {})", in_neuron_index, t);
+                    panic!("Error: input spike must be 0 or 1 in position ({}, {})", in_neuron_index, t);
                 }
                 t_spikes.push(spikes[in_neuron_index][t]);
             }

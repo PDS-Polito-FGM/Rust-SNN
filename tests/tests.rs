@@ -42,14 +42,15 @@ fn fluent_builder_test1() {
 
     let output_spikes = snn.process(&[[0,1,1],[1,1,1],[0,0,1]]);
 
-    println!("\nOUTPUT SPIKES\n");
+    println!("OUTPUT SPIKES");
 
     for spikes in output_spikes.to_vec() {
         for spike in spikes.to_vec() {
-            print!("{} ",spike);
+            print!("{} ", spike);
         }
         println!();
     }
+    println!();
 
     let output_expected:[[u8;3];3] = [[0,0,1],[1,1,1],[1,0,0]];
 
@@ -100,7 +101,7 @@ fn fluent_builder_test2() {
 
     let output_spikes = snn.process(&[[0,1,0],[1,0,1],[0,1,1]]);
 
-    println!("\nOUTPUT SPIKES\n");
+    println!("OUTPUT SPIKES");
 
     for spikes in output_spikes.to_vec() {
         for spike in spikes.to_vec() {
@@ -108,6 +109,7 @@ fn fluent_builder_test2() {
         }
         println!();
     }
+    println!();
 
     let output_expected:[[u8;3];4] = [[1,0,0],[1,1,1],[0,0,0],[1,1,1]];
 
@@ -122,7 +124,7 @@ fn panic_builder_test1() {
     let _snn = SnnBuilder::new()
         .add_layer()
         .weights([
-            [-2.6, 0.2, 0.3],
+            [-2.6, 0.2, 0.3],   /* Negative weight */
             [0.2, 0.9, 0.4]
         ])
         .neurons([
@@ -164,7 +166,7 @@ fn panic_builder_test2() {
         .add_layer()
         .weights([
             [0.1, 0.2, 0.3],
-            [0.2, 3.2, 0.4]
+            [0.2, 3.2, 0.4]     /* weight > 1 */
         ])
         .neurons([
             LifNeuron::new(0.2, 0.01, 0.4, 0.8),
@@ -212,7 +214,7 @@ fn panic_builder_test3() {
             LifNeuron::new(0.1, 0.2, 0.2, 0.2)
         ])
         .intra_weights([
-            [ -4.6, -0.1],
+            [ -4.6, -0.1],   /* intra weight < -1 */
             [-0.4,  0.0]
         ])
         .add_layer()

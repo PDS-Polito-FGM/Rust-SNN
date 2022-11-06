@@ -1,4 +1,3 @@
-use std::borrow::BorrowMut;
 // * private Layer submodule *
 use crate::snn::neuron::Neuron;
 use std::sync::mpsc::{Receiver, Sender};
@@ -42,47 +41,49 @@ impl<N: Neuron + Clone + Send + 'static> Layer<N> {
             let instant = input_spike_event.ts;
             let mut output_spikes = Vec::<u8>::with_capacity(self.neurons.len());
 
-            // * computing for each neuron the intra and extra weighted sums, retrieving also their output spikes *
+            // * for each neuron compute the intra and the extra weighted sums,
+            //   then retrieve the output spike *
             for index in 0..self.neurons.len() {
-                let neuron = self.neurons[index].borrow_mut();
+                let neuron = &mut self.neurons[index];
                 let mut intra_weighted_sum = 0f64;
                 let mut extra_weighted_sum = 0f64;
 
-                let extra_weights = self.weights[index].iter().zip(input_spike_event.spikes.iter())
-                    .map(|(weight,spike)| (weight.clone(),spike.clone())).collect::<Vec<(f64,u8)>>();
+                // compute extra weighted sum
+                let extra_weights_pairs =
+                    self.weights[index].iter().zip(input_spike_event.spikes.iter());
 
-                for (weight,spike) in extra_weights {
-                    if spike != 0 {
-                        extra_weighted_sum += weight;
+                for (weight, spike) in extra_weights_pairs {
+                    if *spike != 0 {
+                        extra_weighted_sum += *weight;
                     }
                 }
 
-                let mut intra_weights = self.intra_weights[index].iter().zip(self.prev_output_spikes.iter())
-                    .map(|(weight,spike)| (weight.clone(),spike.clone())).collect::<Vec<(f64,u8)>>();
+                // compute intra weighted sum
+                let intra_weights_pairs =
+                    self.intra_weights[index].iter().zip(self.prev_output_spikes.iter());
 
-                // remove the reflexive link
-                intra_weights.remove(index);
-
-                for (weight,spike) in intra_weights {
-                    if spike != 0 {
-                        intra_weighted_sum += weight;
+                for (i, (weight, spike)) in intra_weights_pairs.enumerate() {
+                    // ignore the reflexive link
+                    if i != index && *spike != 0 {
+                        intra_weighted_sum += *weight;
                     }
                 }
 
-                let neuron_spike = neuron.compute_v_mem(instant,extra_weighted_sum,intra_weighted_sum);
+                let neuron_spike = neuron.compute_v_mem(instant, extra_weighted_sum, intra_weighted_sum);
                 output_spikes.push(neuron_spike);
             }
 
-            let output_spike_event = SpikeEvent::new(instant,output_spikes.clone());
+            // save output spikes for later
+            self.prev_output_spikes = output_spikes.clone();
 
+            let output_spike_event = SpikeEvent::new(instant, output_spikes);
+            // send output spikes to the next layer
             layer_output_tx.send(output_spike_event)
                 .expect(&format!("Unexpected error sending input spike event t={}", instant));
-
-            self.prev_output_spikes = output_spikes;
         }
 
-        // we don't need to drop the sender, because it will be dropped automatically when the layer goes out of scope
-
+        // * we don't need to drop the sender, because it will be
+        // automatically dropped when the layer goes out of scope *
     }
 }
 

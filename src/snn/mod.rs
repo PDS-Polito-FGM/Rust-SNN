@@ -33,7 +33,7 @@ impl<N: Neuron + Clone + Send + 'static, const NET_INPUT_DIM: usize, const NET_O
     // number of spikes, equal to the duration of the input
     // (spikes is a matrix, one row for each input neuron, and one column for each time instant)
     // * this method is able to check user input at compile-time *
-    pub fn process<const SPIKES_DURATION: usize> (&mut self, spikes: &[[u8; SPIKES_DURATION]; NET_INPUT_DIM])
+    pub fn process<const SPIKES_DURATION: usize>(&mut self, spikes: &[[u8; SPIKES_DURATION]; NET_INPUT_DIM])
         -> [[u8; SPIKES_DURATION]; NET_OUTPUT_DIM] {
         // * encode spikes into SpikeEvent(s) *
         let input_spike_events = SNN::<N, NET_INPUT_DIM, NET_OUTPUT_DIM>::encode_spikes(spikes);
@@ -72,6 +72,12 @@ impl<N: Neuron + Clone + Send + 'static, const NET_INPUT_DIM: usize, const NET_O
 
         // * fire input SpikeEvents into *net_input* tx *
         for spike_event in spikes {
+            // * check if there is at least 1 spike, otherwise skip to the next instant *
+            if spike_event.spikes.iter().all(|spike| *spike == 0u8) {
+                continue;
+            }
+
+            // (process only *effective* spike events)
             let instant = spike_event.ts;
             net_input_tx.send(spike_event)
                         .expect(&format!("Unexpected error sending input spike event t={}", instant));
@@ -150,13 +156,13 @@ impl<N: Neuron + Clone + Send + 'static, const NET_INPUT_DIM: usize, const NET_O
                                      .unwrap_or(&SpikeEvent::new(0, Vec::<u8>::new()))
                                      .spikes {
             // create as many internal Vec<u8> as the length of the first output spike_event (num of output neurons)
-            output_spikes.push(Vec::<u8>::new());
+            output_spikes.push(vec![0u8; spikes_duration.unwrap()]);
         }
 
         // copy processed spikes in the output spikes vec
         for spike_event in output_spike_events {
             for (out_neuron_index, spike) in spike_event.spikes.into_iter().enumerate() {
-                output_spikes[out_neuron_index].push(spike);
+                output_spikes[out_neuron_index][spike_event.ts as usize] = spike;
             }
         }
 
@@ -189,14 +195,10 @@ impl<N: Neuron + Clone + Send + 'static, const NET_INPUT_DIM: usize, const NET_O
     fn decode_spikes<const SPIKES_DURATION: usize>(spikes: Vec<SpikeEvent>)
         -> [[u8; SPIKES_DURATION]; NET_OUTPUT_DIM] {
         let mut result = [[0u8; SPIKES_DURATION]; NET_OUTPUT_DIM];
-        let mut out_neuron_index;
 
         for spike_event in spikes {
-            out_neuron_index = 0;
-
-            for spike in spike_event.spikes {
+            for (out_neuron_index, spike) in spike_event.spikes.into_iter().enumerate() {
                 result[out_neuron_index][spike_event.ts as usize] = spike;
-                out_neuron_index += 1;
             }
         }
 

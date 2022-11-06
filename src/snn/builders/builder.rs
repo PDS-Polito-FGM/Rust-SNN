@@ -170,12 +170,6 @@ impl<N: Neuron + Clone + Send + 'static, const OUTPUT_DIM: usize, const NET_INPU
             layers.push(new_layer);
         }
 
-        /*
-            By including the whole SNN network into the Box smart pointer, we can create a static network
-            that will be never deallocated, so we are granting the right lifetime of the network among the
-            threads
-        */
-
         SNN::<N, NET_INPUT_DIM, OUTPUT_DIM>::new(layers)
     }
 

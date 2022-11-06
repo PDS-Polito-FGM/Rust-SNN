@@ -8,16 +8,16 @@ fn fluent_builder_test1() {
     let mut snn = SnnBuilder::new()
         .add_layer()
             .weights([
-                [0.1, 0.1, 0.3],
-                [0.2, 0.1, 0.3]
+                [0.5, 0.4, 0.3],
+                [0.2, 0.2, 0.6]
             ])
             .neurons([
-                LifNeuron::new(0.3, 0.3, 0.25, 0.8),
-                LifNeuron::new(0.05, 0.2, 0.2, 0.3),
+                LifNeuron::new(0.5, 0.1, 0.25, 1.0),
+                LifNeuron::new(0.5, 0.2, 0.25, 1.0),
             ])
             .intra_weights([
-                [ 0.0, -0.1],
-                [-0.1, -0.0]
+                [ 0.0, -0.2],
+                [-0.3, -0.0]
             ])
         .add_layer()
             .weights([
@@ -26,33 +26,47 @@ fn fluent_builder_test1() {
                 [0.5, 0.1]
             ])
             .neurons([
-                LifNeuron::new(0.1, 0.1, 0.4, 0.4),
-                LifNeuron::new(0.02, 0.3, 0.7, 0.67),
-                LifNeuron::new(0.01, 0.2, 0.9, 0.456)
+                LifNeuron::new(0.5, 0.1, 0.2, 1.0),
+                LifNeuron::new(0.5, 0.1, 0.2, 1.0),
+                LifNeuron::new(0.5, 0.1, 0.2, 1.0)
             ])
             .intra_weights([
-                [ 0.0, -0.1, -0.3],
-                [-0.2,  0.0, -0.5],
-                [-0.1, -0.9,  0.0]
+                [ 0.0, -0.1, -0.1],
+                [-0.1,  0.0, -0.1],
+                [-0.1, -0.1,  0.0]
             ])
         .build();
 
     // printing the SNN network just built
     println!("This is the SNN network built: \n{:?}\n", snn);
 
-    let output_spikes = snn.process(&[[0,1,1],[1,1,1],[0,0,1]]);
+    let input_spikes = [
+        [0,1,1,0],  /* 1st neuron spikes */
+        [1,1,1,0],  /* 2nd neuron spikes */
+        [0,0,1,1]   /* 3rd neuron spikes */
+    ];
+
+    let output_spikes = snn.process(&input_spikes);
 
     println!("OUTPUT SPIKES");
+    print!("t   ");
 
-    for spikes in output_spikes.to_vec() {
-        for spike in spikes.to_vec() {
+    for (n, spikes) in output_spikes.into_iter().enumerate() {
+        if n == 0 {
+            (0..spikes.len()).for_each(|t| print!("{} ", t));
+            println!();
+        }
+
+        print!("N{}  ", n);
+
+        for spike in spikes {
             print!("{} ", spike);
         }
         println!();
     }
     println!();
 
-    let output_expected:[[u8;3];3] = [[0,0,1],[1,1,1],[1,0,0]];
+    let output_expected:[[u8;4];3] = [[0,0,0,0], [0,1,1,0], [0,1,1,0]];
 
     assert_eq!(output_spikes, output_expected);
 }
@@ -111,7 +125,7 @@ fn fluent_builder_test2() {
     }
     println!();
 
-    let output_expected:[[u8;3];4] = [[1,0,0],[1,1,1],[0,0,0],[1,1,1]];
+    let output_expected:[[u8;3];4] = [[1,1,1],[1,1,1],[1,1,1],[1,1,1]];
 
     assert_eq!(output_spikes,output_expected);
 }

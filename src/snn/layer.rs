@@ -40,6 +40,7 @@ impl<N: Neuron + Clone + Send + 'static> Layer<N> {
 
             let instant = input_spike_event.ts;
             let mut output_spikes = Vec::<u8>::with_capacity(self.neurons.len());
+            let mut at_least_one_spike = false;
 
             // * for each neuron compute the intra and the extra weighted sums,
             //   then retrieve the output spike *
@@ -69,15 +70,26 @@ impl<N: Neuron + Clone + Send + 'static> Layer<N> {
                     }
                 }
 
+                // * compute neuron membrane potential and determine if it fires or not *
                 let neuron_spike = neuron.compute_v_mem(instant, extra_weighted_sum, intra_weighted_sum);
                 output_spikes.push(neuron_spike);
+
+                if !at_least_one_spike && neuron_spike > 0u8 {
+                    at_least_one_spike = true;
+                }
             }
 
             // save output spikes for later
             self.prev_output_spikes = output_spikes.clone();
 
+            // * check if at least one neuron fired - if not, not send any spike *
+            if !at_least_one_spike {
+                continue;
+            }
+            // at least one neuron fired -> send output spikes to the next layer
+
             let output_spike_event = SpikeEvent::new(instant, output_spikes);
-            // send output spikes to the next layer
+
             layer_output_tx.send(output_spike_event)
                 .expect(&format!("Unexpected error sending input spike event t={}", instant));
         }

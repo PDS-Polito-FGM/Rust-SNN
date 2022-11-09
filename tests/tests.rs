@@ -125,9 +125,47 @@ fn fluent_builder_test2() {
     }
     println!();
 
-    let output_expected:[[u8;3];4] = [[1,1,1],[1,1,1],[1,1,1],[1,1,1]];
+    let output_expected:[[u8;3];4] = [[1,0,0],[1,0,1],[1,0,1],[1,1,1]];
 
     assert_eq!(output_spikes,output_expected);
+}
+
+#[test]
+fn test2() {
+    let mut snn = SnnBuilder::new()
+        .add_layer()
+        .weights([
+            [0.1, 0.2],
+            [0.3, 0.4],
+            [0.5, 0.6]
+        ]).neurons([
+            LifNeuron::new(0.3, 0.05, 0.1, 1.0),
+            LifNeuron::new(0.3, 0.05, 0.1, 1.0),
+            LifNeuron::new(0.3, 0.05, 0.1, 1.0),
+        ]).intra_weights([
+            [0.0, -0.1, -0.15],
+            [-0.05, 0.0, -0.1],
+            [-0.15, -0.1, 0.0]
+        ]).build();
+
+    println!("This is the SNN network built: \n{:?}\n", snn);
+
+    let output_spikes = snn.process(&[[1,0,1],[0,0,1]]);
+
+    println!("OUTPUT SPIKES");
+
+    for spikes in output_spikes.to_vec() {
+        for spike in spikes.to_vec() {
+            print!("{} ",spike);
+        }
+        println!();
+    }
+    println!();
+
+    let output_expected:[[u8;3];3] = [[0,0,0],[1,0,1],[1,0,1]];
+
+    assert_eq!(output_spikes,output_expected);
+
 }
 
 #[test]

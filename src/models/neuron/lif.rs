@@ -22,8 +22,7 @@ impl LifNeuron {
             v_rest,
             v_reset,
             tau,
-            v_mem: v_rest,      // TODO Note: we have to decide how to initialize this value - Francesco
-                                // TODO Note: v_rest could be a good option - Mario
+            v_mem: v_rest,
             ts: 0u64,
         }
     }
@@ -31,19 +30,15 @@ impl LifNeuron {
 
 impl Neuron for LifNeuron {
     fn compute_v_mem(&mut self, t: u64, extra_weighted_sum: f64, intra_weighted_sum: f64) -> u8 {
-        // update neuron membrane potential *subtracting* the intra_weighted_sum from the previous t_s
-        self.v_mem += intra_weighted_sum;   /* negative contribute */
+        let weighted_sum = extra_weighted_sum + intra_weighted_sum; /* negative contribute */
 
         // * compute the neuron membrane potential with the LIF formula *
 
         let exponent = -(((t - self.ts) as f64) / self.tau);
-        self.v_mem = self.v_rest + (self.v_mem - self.v_rest) * exponent.exp() + extra_weighted_sum;
+        self.v_mem = self.v_rest + (self.v_mem - self.v_rest) * exponent.exp() + weighted_sum;
 
         // * update ts - last instant in which at least one spike (1) is received *
         self.ts = t;
-
-        // TODO Note: if the neuron fires, we have to decrement all the other
-        //            intra weights of the other neurons in the same layer - Francesco
 
         return if self.v_mem > self.v_th {
             // reset membrane potential

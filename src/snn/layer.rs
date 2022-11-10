@@ -27,7 +27,7 @@ impl<N: Neuron + Clone + Send + 'static> Layer<N> {
         }
     }
 
-    //Getters of the layer
+    //Getters of the layer object
     pub fn get_neurons_number(&self) -> usize {
         self.neurons.len()
     }

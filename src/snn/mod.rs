@@ -24,13 +24,18 @@ pub struct SNN<N: Neuron + Clone + Send + 'static, const NET_INPUT_DIM: usize, c
 
 impl<N: Neuron + Clone + Send + 'static, const NET_INPUT_DIM: usize, const NET_OUTPUT_DIM: usize>
     SNN<N, NET_INPUT_DIM, NET_OUTPUT_DIM> {
-    // test
+
     pub fn new(layers: Vec<Layer<N>>) -> Self {
         Self { layers }
     }
 
+    //Getters for the SNN object
     pub fn get_layers_number(&self) -> usize {
         self.layers.len()
+    }
+
+    pub fn get_layers(&self) -> Vec<Layer<N>> {
+        self.layers.clone()
     }
 
     // spikes contains an array for each input layer's neuron, and each array has the same

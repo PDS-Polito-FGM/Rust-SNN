@@ -1,11 +1,9 @@
-#[allow(unused_imports)]
-use crate::builders::SnnBuilder;
-use crate::models::neuron::lif::LifNeuron;
+use pds_snn::builders::SnnBuilder;
+use pds_snn::models::neuron::lif::LifNeuron;
 
 //Tests related to the SNN fluent builders
 
 //This function verifies the correct parameters of the LIF neuron
-#[allow(dead_code)]
 fn verify_neuron(lif_neuron: &LifNeuron, v_th: f64, v_rest: f64, v_reset: f64, tau: f64) -> bool {
 
     if lif_neuron.get_v_th() != v_th {
@@ -306,11 +304,13 @@ fn test_complete_snn() {
             [-0.12, 0.0]
         ]).build();
 
-    assert_eq!(snn.layers.len(),2);
+    let snn_layers = snn.get_layers();
 
-    let layer1 = snn.layers.get(0);
-    let layer2 = snn.layers.get(1);
-    let layer3 = snn.layers.get(2);
+    assert_eq!(snn_layers.len(),2);
+
+    let layer1 = snn_layers.get(0);
+    let layer2 = snn_layers.get(1);
+    let layer3 = snn_layers.get(2);
 
     assert_eq!(layer1.is_some(),true);
     assert_eq!(layer2.is_some(),true);

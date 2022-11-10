@@ -27,7 +27,7 @@ impl LifNeuron {
         }
     }
 
-    //Getters of the neuron
+    //Getters of the neuron object
     pub fn get_v_th(&self) -> f64 {
         self.v_th
     }

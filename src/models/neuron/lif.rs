@@ -26,6 +26,32 @@ impl LifNeuron {
             ts: 0u64,
         }
     }
+
+    //Getters of the neuron
+    pub fn get_v_th(&self) -> f64 {
+        self.v_th
+    }
+
+    pub fn get_v_rest(&self) -> f64 {
+        self.v_rest
+    }
+
+    pub fn get_v_reset(&self) -> f64 {
+        self.v_reset
+    }
+
+    pub fn get_tau(&self) -> f64 {
+        self.tau
+    }
+
+    pub fn get_v_mem(&self) -> f64 {
+        self.v_mem
+    }
+
+    pub fn get_ts(&self) -> u64 {
+        self.ts
+    }
+
 }
 
 impl Neuron for LifNeuron {

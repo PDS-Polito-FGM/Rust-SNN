@@ -6,7 +6,7 @@ use crate::snn::SNN;
 
 
 /** Object containing the configuration parameters describing the SNN architecture */
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SnnParams<N: Neuron + Clone + Send + 'static> {
     pub input_dimensions: usize,            /* dimension of the network input layer */
     pub neurons: Vec<Vec<N>>,               /* neurons per each layer */
@@ -18,7 +18,7 @@ pub struct SnnParams<N: Neuron + Clone + Send + 'static> {
     It allows to configure the network step-by-step, adding one layer at a time,
     specifying the (extra)weights the neurons and the intra weights for each layer.
     - It follows the (fluent) Builder design pattern. */
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SnnBuilder<N: Neuron + Clone + Send + 'static> {
     params: SnnParams<N>
 }
@@ -35,6 +35,10 @@ impl<N: Neuron + Clone + Send + 'static> SnnBuilder<N> {
         }
     }
 
+    pub fn get_params(&self) -> SnnParams<N> {
+        self.params.clone()
+    }
+
     // (the *input dimension* of the network can be automatically inferred by the compiler)
     pub fn add_layer<const INPUT_DIM: usize>(self) -> WeightsBuilder<N, INPUT_DIM, INPUT_DIM> {
         WeightsBuilder::<N, INPUT_DIM, INPUT_DIM>::new(self.params)
@@ -46,7 +50,7 @@ impl<N: Neuron + Clone + Send + 'static> SnnBuilder<N> {
 // * Weights *
 /** - INPUT_DIM: is the input dimension of the new layer
     - NET_INPUT_DIM: is the input dimension of the entire neural network */
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct WeightsBuilder<N: Neuron + Clone + Send + 'static, const INPUT_DIM: usize, const NET_INPUT_DIM: usize> {
     params: SnnParams<N>
 }
@@ -55,6 +59,10 @@ impl<N: Neuron + Clone + Send + 'static, const INPUT_DIM: usize, const NET_INPUT
     WeightsBuilder<N, INPUT_DIM, NET_INPUT_DIM> {
     pub fn new(params: SnnParams<N>) -> Self {
         Self { params }
+    }
+
+    pub fn get_params(&self) -> SnnParams<N> {
+        self.params.clone()
     }
 
     /** It specifies the weights of the connections between the previous layer and the new one.
@@ -78,7 +86,7 @@ impl<N: Neuron + Clone + Send + 'static, const INPUT_DIM: usize, const NET_INPUT
 }
 
 // * Neurons *
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct NeuronsBuilder<N: Neuron + Clone + Send + 'static, const NUM_NEURONS: usize, const NET_INPUT_DIM: usize> {
     params: SnnParams<N>
 }
@@ -89,6 +97,10 @@ impl<N: Neuron + Clone + Send + 'static, const NUM_NEURONS: usize, const NET_INP
         Self { params }
     }
 
+    pub fn get_params(&self) -> SnnParams<N> {
+        self.params.clone()
+    }
+
     /** Add an array of (ordered) neurons to the layer */
     pub fn neurons(mut self, neurons: [N; NUM_NEURONS]) -> IntraWeightsBuilder<N, NUM_NEURONS, NET_INPUT_DIM> {
         self.params.neurons.push(Vec::from(neurons));
@@ -97,7 +109,7 @@ impl<N: Neuron + Clone + Send + 'static, const NUM_NEURONS: usize, const NET_INP
 }
 
 // * Intra Weights *
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct IntraWeightsBuilder<N: Neuron + Clone + Send + 'static, const NUM_NEURONS: usize, const NET_INPUT_DIM: usize> {
     params: SnnParams<N>
 }
@@ -106,6 +118,10 @@ impl<N: Neuron + Clone + Send + 'static, const NUM_NEURONS: usize, const NET_INP
     IntraWeightsBuilder<N, NUM_NEURONS, NET_INPUT_DIM> {
     pub fn new(params: SnnParams<N>) -> Self {
         Self { params }
+    }
+
+    pub fn get_params(&self) -> SnnParams<N> {
+        self.params.clone()
     }
 
     /** It specifies the (negative) weights of the connections between neurons in the same layer
@@ -135,7 +151,7 @@ impl<N: Neuron + Clone + Send + 'static, const NUM_NEURONS: usize, const NET_INP
 
 // * Layer *
 /** It allows to add a new layer, or to build and get the SNN with the characteristics defined so far */
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct LayerBuilder<N: Neuron + Clone + Send + 'static, const OUTPUT_DIM: usize, const NET_INPUT_DIM: usize> {
     params: SnnParams<N>
 }
@@ -144,6 +160,10 @@ impl<N: Neuron + Clone + Send + 'static, const OUTPUT_DIM: usize, const NET_INPU
     LayerBuilder<N, OUTPUT_DIM, NET_INPUT_DIM> {
     pub fn new(params: SnnParams<N>) -> Self {
         Self { params }
+    }
+
+    pub fn get_params(&self) -> SnnParams<N> {
+        self.params.clone()
     }
 
     /** Create and initialize the whole Spiking Neural Network with the characteristics defined so far */

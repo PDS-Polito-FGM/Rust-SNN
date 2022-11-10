@@ -3,7 +3,6 @@ use crate::snn::neuron::Neuron;
 use std::sync::mpsc::{Receiver, Sender};
 use crate::snn::SpikeEvent;
 
-
 /* Object representing a Layer of the Spiking Neural Network */
 #[derive(Debug)]
 pub struct Layer<N: Neuron + Clone + Send + 'static> {
@@ -12,7 +11,6 @@ pub struct Layer<N: Neuron + Clone + Send + 'static> {
     intra_weights: Vec<Vec<f64>>,
     prev_output_spikes: Vec<u8>
 }
-
 
 impl<N: Neuron + Clone + Send + 'static> Layer<N> {
     pub fn new(
@@ -27,6 +25,19 @@ impl<N: Neuron + Clone + Send + 'static> Layer<N> {
             intra_weights,
             prev_output_spikes: vec![0; num_neurons]
         }
+    }
+
+    //Getters of the layer
+    pub fn get_neurons_number(&self) -> usize {
+        self.neurons.len()
+    }
+
+    pub fn get_weights(&self) -> Vec<Vec<f64>> {
+        self.weights.clone()
+    }
+
+    pub fn get_intra_weights(&self) -> Vec<Vec<f64>> {
+        self.intra_weights.clone()
     }
 
     /** It processes the input SpikeEvent(s) from the previous layer, according to the model

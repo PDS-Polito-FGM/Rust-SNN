@@ -32,6 +32,8 @@ impl<N: Neuron + Clone + Send + 'static> Layer<N> {
         self.neurons.len()
     }
 
+    pub fn get_neurons(&self) -> Vec<N> { self.neurons.clone() }
+
     pub fn get_weights(&self) -> Vec<Vec<f64>> {
         self.weights.clone()
     }

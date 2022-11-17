@@ -47,9 +47,61 @@ fn test_process_snn_with_only_one_layer() {
     let output_spikes = snn.process(&[[1,0,1],[0,0,1]]);
     let output_expected:[[u8; 3]; 3] = [[0,0,0],[1,0,1],[1,0,1]];
 
+    assert_eq!(output_spikes, output_expected);
+
     print_output("test_process_snn_with_only_one_layer", output_spikes.iter().map(|x| x.to_vec()).collect());
 
+}
+
+#[test]
+fn test_process_snn_with_more_than_one_layer_and_same_neurons() {
+    #[rustfmt::skip]
+
+    let mut snn = SnnBuilder::new()
+        .add_layer()
+        .weights([
+            [0.1, 0.2],
+            [0.3, 0.4],
+            [0.5, 0.6]
+        ]).neurons([
+            LifNeuron::new(0.3, 0.05, 0.1, 1.0),
+            LifNeuron::new(0.3, 0.05, 0.1, 1.0),
+            LifNeuron::new(0.3, 0.05, 0.1, 1.0),
+        ]).intra_weights([
+            [0.0, -0.1, -0.15],
+            [-0.05, 0.0, -0.1],
+            [-0.15, -0.1, 0.0]
+        ]).add_layer()
+        .weights([
+            [0.3, 0.2, 0.1]
+        ]).neurons([
+            LifNeuron::new(0.3, 0.05, 0.1, 1.0),
+        ]).intra_weights([[0.0]])
+        .add_layer()
+        .weights([
+            [0.3],
+            [0.2],
+            [0.5],
+            [0.3]
+        ]).neurons([
+            LifNeuron::new(0.3, 0.05, 0.1, 1.0),
+            LifNeuron::new(0.3, 0.05, 0.1, 1.0),
+            LifNeuron::new(0.3, 0.05, 0.1, 1.0),
+            LifNeuron::new(0.3, 0.05, 0.1, 1.0)
+        ]).intra_weights([
+            [0.0, -0.1, -0.2, -0.3],
+            [-0.1, 0.0, -0.4, -0.2],
+            [-0.6, -0.2, 0.0, -0.9],
+            [-0.5, -0.3, -0.8, 0.0]
+        ]).build();
+
+    let output_spikes = snn.process(&[[1,0,1],[0,0,1]]);
+    let output_expected:[[u8; 3]; 4] = [[1,0,0],[0,0,0],[1,0,0],[1,0,0]];
+
     assert_eq!(output_spikes, output_expected);
+
+    print_output("test_process_snn_with_more_than_one_layer_and_same_neurons", output_spikes.iter().map(|x| x.to_vec()).collect());
+
 }
 
 #[test]
@@ -75,9 +127,60 @@ fn test_process_snn_with_only_one_layer_and_different_neurons() {
     let output_spikes = snn.process(&[[1,1,0],[0,1,0],[0,1,1],[0,0,1]]);
     let output_expected: [[u8; 3]; 3]  = [[0,1,0],[0,1,0],[1,1,1]];
 
+    assert_eq!(output_spikes, output_expected);
+
     print_output("test_process_snn_with_only_one_layer_and_different_neurons", output_spikes.iter().map(|x| x.to_vec()).collect());
 
+}
+
+#[test]
+fn test_process_snn_with_more_than_one_layer_and_different_neurons() {
+    #[rustfmt::skip]
+
+    let mut snn = SnnBuilder::new()
+        .add_layer()
+        .weights([
+            [0.1, 0.2],
+            [0.3, 0.4]
+        ]).neurons([
+            LifNeuron::new(0.5, 0.1, 0.2, 0.7),
+            LifNeuron::new(0.3, 0.05, 0.1, 1.0),
+        ]).intra_weights([
+            [0.0, -0.4],
+            [-0.1, 0.0]
+        ]).add_layer()
+        .weights([
+            [0.7, 0.2],
+            [0.3, 0.8],
+            [0.5, 0.6],
+            [0.3, 0.2]
+        ]).neurons([
+            LifNeuron::new(0.2, 0.1, 0.15, 0.1),
+            LifNeuron::new(0.3, 0.2, 0.05, 0.3),
+            LifNeuron::new(0.4, 0.15, 0.1, 0.8),
+            LifNeuron::new(0.05, 0.35, 0.01, 1.0),
+        ]).intra_weights([
+            [0.0, -0.2, -0.4, -0.9],
+            [-0.1, 0.0, -0.3, -0.2],
+            [-0.6, -0.2, 0.0, -0.9],
+            [-0.5, -0.3, -0.8, 0.0]
+        ])
+        .add_layer()
+        .weights([
+            [0.3, 0.3, 0.2, 0.7]
+        ]).neurons([
+            LifNeuron::new(0.3, 0.05, 0.1, 1.0)
+        ]).intra_weights([
+            [0.0]
+        ]).build();
+
+    let output_spikes = snn.process(&[[1,0,1,0],[0,0,1,1]]);
+    let output_expected:[[u8; 4]; 1] = [[1,0,1,1]];
+
     assert_eq!(output_spikes, output_expected);
+
+    print_output("test_process_snn_with_more_than_one_layer_and_different_neurons", output_spikes.iter().map(|x| x.to_vec()).collect());
+
 }
 
 #[test]
@@ -106,9 +209,10 @@ fn test_process_snn_with_different_neurons() {
     let output_spikes = snn.process(&[[1,1,0,1,0,1,1,1,1],[0,1,0,0,1,0,0,0,0],[0,1,1,0,1,0,0,0,0],[0,0,1,0,1,0,0,0,0]]);
     let output_expected: [[u8; 9]; 4] = [[0,0,0,0,1,0,0,0,0],[1,1,1,0,1,0,1,1,1],[0,1,1,0,1,0,0,0,0],[0,0,1,0,1,0,0,0,0]];
 
+    assert_eq!(output_spikes, output_expected);
+
     print_output("test_process_snn_with_different_neurons", output_spikes.iter().map(|x| x.to_vec()).collect());
 
-    assert_eq!(output_spikes, output_expected);
 }
 
 #[test]
@@ -134,9 +238,10 @@ fn test_process_snn_with_all_zeros_as_input() {
     let output_spikes = snn.process(&[[0,0,0,0],[0,0,0,0],[0,0,0,0]]);
     let output_expected: [[u8; 4]; 3] = [[0,0,0,0],[0,0,0,0],[0,0,0,0]];
 
+    assert_eq!(output_spikes, output_expected);
+
     print_output("test_process_snn_with_all_zeros_as_input", output_spikes.iter().map(|x| x.to_vec()).collect());
 
-    assert_eq!(output_spikes, output_expected);
 }
 
 #[test]
@@ -162,9 +267,10 @@ fn test_process_snn_with_zero_inputs() {
     let output_spikes = snn.process(&[[],[],[]]);
     let output_expected: [[u8; 0]; 3] = [[],[],[]];
 
+    assert_eq!(output_spikes, output_expected);
+
     print_output("test_process_snn_with_zero_inputs", output_spikes.iter().map(|x| x.to_vec()).collect());
 
-    assert_eq!(output_spikes, output_expected);
 }
 
 #[test]
@@ -190,9 +296,10 @@ fn test_process_snn_with_only_one_input() {
     let output_spikes = snn.process(&[[0],[1]]);
     let output_expected: [[u8; 1]; 3] = [[0],[1],[0]];
 
+    assert_eq!(output_spikes, output_expected);
+
     print_output("test_process_snn_with_only_one_input", output_spikes.iter().map(|x| x.to_vec()).collect());
 
-    assert_eq!(output_spikes, output_expected);
 }
 
 #[test]
@@ -218,9 +325,10 @@ fn test_process_snn_with_zero_weights() {
     let output_spikes = snn.process(&[[1,1,0],[0,1,0],[0,1,1],[0,0,1]]);
     let output_expected: [[u8; 3]; 3] = [[0,0,0],[0,0,0],[0,0,0]];
 
+    assert_eq!(output_spikes, output_expected);
+
     print_output("test_process_snn_with_zero_weights", output_spikes.iter().map(|x| x.to_vec()).collect());
 
-    assert_eq!(output_spikes, output_expected);
 }
 
 #[test]

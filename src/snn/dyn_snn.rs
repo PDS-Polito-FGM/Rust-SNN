@@ -1,36 +1,18 @@
 use std::sync::mpsc::channel;
 use std::thread;
+use crate::neuron::Neuron;
 use crate::snn::layer::Layer;
-use crate::snn::neuron::Neuron;
+use crate::SpikeEvent;
 
-pub mod builders;
-    mod layer; // private
-pub mod neuron;
-mod dyn_snn;
-
-// * SNN module *
-
-/**
-    Object representing the Spiking Neural Network itself
-    - N: is the type representing the Neuron
-    - NET_INPUT_DIM: is the input dimension of the network, i.e. the size of the input layer
-    - NET_OUTPUT_DIM: is the output dimension of the network, i.e. the size of the output layer
-    Having a generic cons type such as NET_INPUT_DIM allows to check at compile time
-    the size of the input provided by the user
-*/
-#[derive(Debug)]
-pub struct SNN<N: Neuron + Clone + Send + 'static, const NET_INPUT_DIM: usize, const NET_OUTPUT_DIM: usize> {
+#[derive(Debug, Clone)]
+pub struct DynSNN <N: Neuron + Clone + 'static>{
     layers: Vec<Layer<N>>
 }
 
-impl<N: Neuron + Clone + Send + 'static, const NET_INPUT_DIM: usize, const NET_OUTPUT_DIM: usize>
-    SNN<N, NET_INPUT_DIM, NET_OUTPUT_DIM> {
-
+impl<N: Neuron + Clone> DynSNN<N> {
     pub fn new(layers: Vec<Layer<N>>) -> Self {
         Self { layers }
     }
-
-    //Getters for the SNN object
     pub fn get_layers_number(&self) -> usize {
         self.layers.len()
     }
@@ -39,28 +21,56 @@ impl<N: Neuron + Clone + Send + 'static, const NET_INPUT_DIM: usize, const NET_O
         self.layers.clone()
     }
 
-    // spikes contains an array for each input layer's neuron, and each array has the same
-    // number of spikes, equal to the duration of the input
-    // (spikes is a matrix, one row for each input neuron, and one column for each time instant)
-    // * this method is able to check user input at compile-time *
-    pub fn process<const SPIKES_DURATION: usize>(&mut self, spikes: &[[u8; SPIKES_DURATION]; NET_INPUT_DIM])
-        -> [[u8; SPIKES_DURATION]; NET_OUTPUT_DIM] {
+    pub fn process<const SPIKES_DURATION: usize>(&mut self, spikes: &[[u8; SPIKES_DURATION]])
+                                                 -> Vec<Vec<u8>> {
         // * encode spikes into SpikeEvent(s) *
-        let input_spike_events = SNN::<N, NET_INPUT_DIM, NET_OUTPUT_DIM>::encode_spikes(spikes);
+        let input_spike_events = DynSNN::<N>::encode_spikes(spikes);
 
         // * process input *
         let output_spike_events = self.process_events(input_spike_events);
+        println!("output_spike_events: {:?}", output_spike_events);
         // * decode output into array shape *
-        let decoded_output: [[u8; SPIKES_DURATION]; NET_OUTPUT_DIM] =
-            SNN::<N, NET_INPUT_DIM, NET_OUTPUT_DIM>::decode_spikes(output_spike_events);
+        let decoded_output =  self.decode_spikes(output_spike_events);
 
         decoded_output
     }
 
+    fn encode_spikes<const SPIKES_DURATION: usize>(spikes: &[[u8; SPIKES_DURATION]]) -> Vec<SpikeEvent> {
+        let mut spike_events = Vec::<SpikeEvent>::new();
+        //NEED TO CHECK LEN OF THE SPIKES COHERENT WITH THE INPUT LAYER DIMENSION
+        for t in 0..SPIKES_DURATION {
+            let mut t_spikes = Vec::<u8>::new();
+
+            // retrieve the input spikes for each neuron
+            for in_neuron_index in 0..spikes.len(){
+                if spikes[in_neuron_index][t] != 0 && spikes[in_neuron_index][t] != 1 {
+                    panic!("Error: input spike must be 0 or 1");
+                }
+                t_spikes.push(spikes[in_neuron_index][t]);
+            }
+
+            let t_spike_event = SpikeEvent::new(t as u64, t_spikes);
+            spike_events.push(t_spike_event);
+        }
+
+        spike_events
+    }
+
+    fn decode_spikes(&self ,spikes: Vec<SpikeEvent>) -> Vec<Vec<u8>> {
+        let spikes_duration = spikes.iter().next().unwrap().spikes.len();
+        let output_dimension = self.layers.last().unwrap().get_neurons_number();
+        let mut result  = vec![vec![0; spikes_duration];  output_dimension];
+        for spike_event in spikes {
+            for (out_neuron_index, spike) in spike_event.spikes.into_iter().enumerate() {
+                result[out_neuron_index][spike_event.ts as usize] = spike;
+            }
+        }
+        result
+    }
     fn process_events(&mut self, spikes: Vec<SpikeEvent>) -> Vec<SpikeEvent> {
         // create the threads' pool
         let mut threads = Vec::new();
-
+        // IT'S BETTER TO SHARE THIS FUNCTION WITH THE OTHER SNN
         // create input TX and output RC for each layers and spawn layers threads
         let (net_input_tx, mut layer_rc) = channel::<SpikeEvent>();
 
@@ -89,7 +99,7 @@ impl<N: Neuron + Clone + Send + 'static, const NET_INPUT_DIM: usize, const NET_O
             // (process only *effective* spike events)
             let instant = spike_event.ts;
             net_input_tx.send(spike_event)
-                        .expect(&format!("Unexpected error sending input spike event t={}", instant));
+                .expect(&format!("Unexpected error sending input spike event t={}", instant));
         }
         drop(net_input_tx); // * drop input tx, to make all the threads terminate *
 
@@ -108,13 +118,10 @@ impl<N: Neuron + Clone + Send + 'static, const NET_INPUT_DIM: usize, const NET_O
         output_events
     }
 
-    // (same as process(), but it checks input spikes sizes at *run-time*:
-    // spikes must have a number of Vec(s) equal to NET_INPUT_DIM, and all
-    // these Vec(s) must have the same length), otherwise panic!()
     fn _process_dyn(&mut self, spikes: Vec<Vec<u8>>) -> Vec<Vec<u8>> {
         // check num of spikes vec(s)
-        if spikes.len() != NET_INPUT_DIM {
-            panic!("Error: dimensions mismatch - each input layer's neuron must have its own spikes vec");
+        if spikes.len() != self.layers[0].get_neurons_number() {
+            panic!("Error: number of input spikes must be equal to the number of input neurons");
         }
 
         // * encode input spikes in spike events *
@@ -162,8 +169,8 @@ impl<N: Neuron + Clone + Send + 'static, const NET_INPUT_DIM: usize, const NET_O
         let mut output_spikes: Vec<Vec<u8>> = Vec::new();
 
         for _ in &output_spike_events.get(0)
-                                     .unwrap_or(&SpikeEvent::new(0, Vec::<u8>::new()))
-                                     .spikes {
+            .unwrap_or(&SpikeEvent::new(0, Vec::<u8>::new()))
+            .spikes {
             // create as many internal Vec<u8> as the length of the first output spike_event (num of output neurons)
             output_spikes.push(vec![0u8; spikes_duration.unwrap()]);
         }
@@ -177,53 +184,8 @@ impl<N: Neuron + Clone + Send + 'static, const NET_INPUT_DIM: usize, const NET_O
 
         output_spikes
     }
-
-    // * private functions *
-    fn encode_spikes<const SPIKES_DURATION: usize>(spikes: &[[u8; SPIKES_DURATION]; NET_INPUT_DIM])
-        -> Vec<SpikeEvent> {
-        let mut spike_events = Vec::<SpikeEvent>::new();
-
-        for t in 0..SPIKES_DURATION {
-            let mut t_spikes = Vec::<u8>::new();
-
-            // retrieve the input spikes for each neuron
-            for in_neuron_index in 0..NET_INPUT_DIM {
-                if spikes[in_neuron_index][t] != 0 && spikes[in_neuron_index][t] != 1 {
-                    panic!("Error: input spike must be 0 or 1 ");
-                }
-                t_spikes.push(spikes[in_neuron_index][t]);
-            }
-
-            let t_spike_event = SpikeEvent::new(t as u64, t_spikes);
-            spike_events.push(t_spike_event);
-        }
-
-        spike_events
-    }
-
-    fn decode_spikes<const SPIKES_DURATION: usize>(spikes: Vec<SpikeEvent>)
-        -> [[u8; SPIKES_DURATION]; NET_OUTPUT_DIM] {
-        let mut result = [[0u8; SPIKES_DURATION]; NET_OUTPUT_DIM];
-
-        for spike_event in spikes {
-            for (out_neuron_index, spike) in spike_event.spikes.into_iter().enumerate() {
-                result[out_neuron_index][spike_event.ts as usize] = spike;
-            }
-        }
-
-        result
-    }
 }
 
-/* Object representing the output spikes generated by a single layer */
-#[derive(Debug)]
-pub struct SpikeEvent {
-    ts: u64,
-    spikes: Vec<u8>,
-}
 
-impl SpikeEvent {
-    pub fn new(ts: u64, spikes: Vec<u8>) -> Self {
-        Self { ts, spikes }
-    }
-}
+
+

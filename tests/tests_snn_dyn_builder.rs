@@ -31,9 +31,8 @@ fn verify_neuron(lif_neuron: &LifNeuron, v_th: f64, v_rest: f64, v_reset: f64, t
 }
 
 #[test]
-#[ignore]
 fn test_add_one_layer() {
-    #[rustfmt::skip]
+
 
     let snn = DynSnnBuilder::<LifNeuron>::new()
             .add_layer(vec![], vec![], vec![])
@@ -43,7 +42,6 @@ fn test_add_one_layer() {
 }
 
 #[test]
-#[ignore]
 fn test_add_more_than_one_layer() {
     #[rustfmt::skip]
 
@@ -58,7 +56,6 @@ fn test_add_more_than_one_layer() {
 }
 
 #[test]
-#[ignore]
 fn test_add_weights_to_layers() {
     #[rustfmt::skip]
 
@@ -91,7 +88,6 @@ fn test_add_weights_to_layers() {
 }
 
 #[test]
-#[ignore]
 fn test_layer_with_one_neuron() {
     #[rustfmt::skip]
 
@@ -117,7 +113,6 @@ fn test_layer_with_one_neuron() {
 }
 
 #[test]
-#[ignore]
 fn test_neurons_with_same_parameters() {
     #[rustfmt::skip]
 
@@ -148,7 +143,6 @@ let snn_params = DynSnnBuilder::<LifNeuron>::new()
 }
 
 #[test]
-#[ignore]
 fn test_layer_with_more_than_one_neuron() {
     #[rustfmt::skip]
 
@@ -190,7 +184,6 @@ fn test_layer_with_more_than_one_neuron() {
 }
 
 #[test]
-#[ignore]
 fn test_intra_layer_weights_with_one_neuron() {
     #[rustfmt::skip]
 
@@ -216,7 +209,6 @@ fn test_intra_layer_weights_with_one_neuron() {
 }
 
 #[test]
-#[ignore]
 fn test_intra_layer_weights_with_more_than_one_neuron() {
     #[rustfmt::skip]
 
@@ -258,7 +250,6 @@ fn test_intra_layer_weights_with_more_than_one_neuron() {
 }
 
 #[test]
-#[ignore]
 fn test_complete_snn() {
     #[rustfmt::skip]
 
@@ -350,7 +341,6 @@ fn test_complete_snn() {
 
 #[test]
 #[should_panic]
-#[ignore]
 fn test_snn_with_negative_weights() {
     #[rustfmt::skip]
 
@@ -367,7 +357,6 @@ fn test_snn_with_negative_weights() {
 
 #[test]
 #[should_panic]
-#[ignore]
 fn test_snn_with_weights_greater_than_one() {
     #[rustfmt::skip]
 
@@ -384,7 +373,6 @@ fn test_snn_with_weights_greater_than_one() {
 
 #[test]
 #[should_panic]
-#[ignore]
 fn test_snn_with_positive_intra_weights() {
     #[rustfmt::skip]
 
@@ -404,7 +392,6 @@ fn test_snn_with_positive_intra_weights() {
 
 #[test]
 #[should_panic]
-#[ignore]
 fn test_snn_with_intra_weights_greater_than_one() {
     #[rustfmt::skip]
 

@@ -1,4 +1,3 @@
-extern crate core;
 
 pub use self::snn::SNN;
 pub use self::snn::builders;

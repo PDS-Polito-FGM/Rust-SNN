@@ -32,10 +32,48 @@ impl<N: Neuron + Clone> DynSnnBuilder<N> {
         self.params.clone()
     }
 
+    fn check_intra_weights(&self, num_neuros: usize, weights: &Vec<Vec<f64>>)  {
+        if num_neuros != weights.len() {
+            panic!("The number of neurons must be equal to the number of rows in the intra weights matrix");
+        }
+        for row in weights {
+            if num_neuros != row.len() {
+                panic!("The number of neurons must be equal to the number of columns in the intra weights matrix");
+            }
+            for weight in row {
+                if *weight > 0.0 || *weight < -1.0 {
+                    panic!("The intra weights must be negative and in the range [-1, 0]");
+                }
+            }
+        }
+    }
+
+    fn check_weights(&self, num_neurons: usize, weights: &Vec<Vec<f64>>) {
+        if num_neurons != weights.len() {
+            panic!("The number of neurons must be equal to the number of rows in the weights matrix");
+        }
+        for row in weights {
+            if row.len() != self.params.neurons[self.params.num_layers - 1].len() {
+                panic!("The number of columns in the weights matrix must be equal to the number of neurons in the previous layer");
+            }
+            for weight in row {
+                if *weight < 0.0 || *weight > 1.0 {
+                    panic!("The weights must be positive and in the range [0, 1]");
+                }
+            }
+        }
+    }
+
     pub fn add_layer(mut self, neurons: Vec<N>, extra_weights: Vec<Vec<f64>>, intra_weights: Vec<Vec<f64>>) -> Self {
         if self.params.num_layers == 0 {
+            self.check_intra_weights(neurons.len(),&intra_weights);
             self.params.input_dimensions = neurons.len();
         }
+        else {
+            self.check_intra_weights(neurons.len(),&intra_weights);
+            self.check_weights(neurons.len(),&extra_weights);
+        }
+
         let mut params = self.params;
         params.neurons.push(neurons);
         params.extra_weights.push(extra_weights);

@@ -24,19 +24,20 @@ impl<N: Neuron + Clone> DynSNN<N> {
     pub fn process<const SPIKES_DURATION: usize>(&mut self, spikes: &[[u8; SPIKES_DURATION]])
                                                  -> Vec<Vec<u8>> {
         // * encode spikes into SpikeEvent(s) *
-        let input_spike_events = DynSNN::<N>::encode_spikes(spikes);
-
+        let input_spike_events = self.encode_spikes(spikes);
         // * process input *
         let output_spike_events = self.process_events(input_spike_events);
-        println!("output_spike_events: {:?}", output_spike_events);
         // * decode output into array shape *
         let decoded_output =  self.decode_spikes(output_spike_events, SPIKES_DURATION);
         decoded_output
     }
 
-    fn encode_spikes<const SPIKES_DURATION: usize>(spikes: &[[u8; SPIKES_DURATION]]) -> Vec<SpikeEvent> {
+    fn encode_spikes<const SPIKES_DURATION: usize>(&self, spikes: &[[u8; SPIKES_DURATION]]) -> Vec<SpikeEvent> {
         let mut spike_events = Vec::<SpikeEvent>::new();
-        //NEED TO CHECK LEN OF THE SPIKES COHERENT WITH THE INPUT LAYER DIMENSION
+
+        if spikes.len()!= self.layers[0].get_weights().first().unwrap().len() {
+            panic!("The number of input spikes is not coherent with the input layer dimension");
+        }
         for t in 0..SPIKES_DURATION {
             let mut t_spikes = Vec::<u8>::new();
 

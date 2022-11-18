@@ -32,6 +32,7 @@ impl<N: Neuron + Clone> DynSnnBuilder<N> {
         self.params.clone()
     }
 
+
     fn check_intra_weights(&self, num_neuros: usize, weights: &Vec<Vec<f64>>)  {
         if num_neuros != weights.len() {
             panic!("The number of neurons must be equal to the number of rows in the intra weights matrix");
@@ -90,6 +91,9 @@ impl<N: Neuron + Clone> DynSnnBuilder<N> {
     }
 
     pub fn build(self) -> DynSNN<N> {
+        if self.params.num_layers == 0 {
+            panic!("The network must have at least one layer");
+        }
         if  self.params.neurons.len() != self.params.extra_weights.len() &&
             self.params.neurons.len() != self.params.intra_weights.len() {
             // it must not happen

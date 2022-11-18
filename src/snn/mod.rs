@@ -39,6 +39,8 @@ impl<N: Neuron + Clone + Send + 'static, const NET_INPUT_DIM: usize, const NET_O
         self.layers.clone()
     }
 
+
+
     // spikes contains an array for each input layer's neuron, and each array has the same
     // number of spikes, equal to the duration of the input
     // (spikes is a matrix, one row for each input neuron, and one column for each time instant)

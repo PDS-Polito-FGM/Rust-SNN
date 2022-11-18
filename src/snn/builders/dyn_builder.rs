@@ -16,10 +16,10 @@ pub struct DynSnnBuilder<N: Neuron> {
 }
 
 impl<N: Neuron + Clone> DynSnnBuilder<N> {
-    pub fn new() -> Self {
+    pub fn new(input_dimesion: usize) -> Self {
         Self {
             params: DynSnnParams {
-                input_dimensions: 0,
+                input_dimensions: input_dimesion,
                 neurons: vec![],
                 extra_weights: vec![],
                 intra_weights: vec![],
@@ -52,9 +52,16 @@ impl<N: Neuron + Clone> DynSnnBuilder<N> {
         if num_neurons != weights.len() {
             panic!("The number of neurons must be equal to the number of rows in the weights matrix");
         }
+
         for row in weights {
-            if row.len() != self.params.neurons[self.params.num_layers - 1].len() {
+            if self.params.num_layers == 0 {
+                if row.len()!= self.params.input_dimensions {
+                    panic!("The number of neurons must be equal to the number of columns in the weights matrix");
+                }
+            }
+            else {  if row.len() != self.params.neurons[self.params.num_layers - 1].len() {
                 panic!("The number of columns in the weights matrix must be equal to the number of neurons in the previous layer");
+            }
             }
             for weight in row {
                 if *weight < 0.0 || *weight > 1.0 {
@@ -64,10 +71,10 @@ impl<N: Neuron + Clone> DynSnnBuilder<N> {
         }
     }
 
-    pub fn add_layer(mut self, neurons: Vec<N>, extra_weights: Vec<Vec<f64>>, intra_weights: Vec<Vec<f64>>) -> Self {
+    pub fn add_layer( self, neurons: Vec<N>, extra_weights: Vec<Vec<f64>>, intra_weights: Vec<Vec<f64>>) -> Self {
         if self.params.num_layers == 0 {
             self.check_intra_weights(neurons.len(),&intra_weights);
-            self.params.input_dimensions = neurons.len();
+            self.check_weights(neurons.len(),&extra_weights);
         }
         else {
             self.check_intra_weights(neurons.len(),&intra_weights);

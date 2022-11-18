@@ -441,3 +441,51 @@ fn test_dyn_snn_input_spikes_greater_than_one() {
     let _output_spikes = snn.process(&[[0,50],[0,1]]);
 
 }
+
+#[test]
+#[should_panic]
+fn test_dyn_snn_input_spikes_greater_than_input_dimension() {
+    #[rustfmt::skip]
+
+        /*
+            This test case has to panic because the input spikes entered
+            are different than the input dimension
+        */
+
+        let mut snn = DynSnnBuilder::new(2)
+        .add_layer(vec![
+            LifNeuron::new(0.3, 0.05, 0.84, 1.0),
+            LifNeuron::new(0.3, 0.87, 0.12, 0.89)], vec![
+            vec![0.12, 0.5],
+            vec![0.53, 0.43]], vec![
+            vec![0.0, -0.3],
+            vec![-0.4, 0.0]
+        ]).build();
+
+    let _output_spikes = snn.process(&[[0,0],[0,1],[1,1]]);
+
+}
+
+#[test]
+#[should_panic]
+fn test_dyn_snn_input_spikes_lower_than_input_dimension() {
+    #[rustfmt::skip]
+
+        /*
+            This test case has to panic because the input spikes entered
+            are different than the input dimension
+        */
+
+        let mut snn = DynSnnBuilder::new(2)
+        .add_layer(vec![
+            LifNeuron::new(0.3, 0.05, 0.84, 1.0),
+            LifNeuron::new(0.3, 0.87, 0.12, 0.89)], vec![
+            vec![0.12, 0.5],
+            vec![0.53, 0.43]], vec![
+            vec![0.0, -0.3],
+            vec![-0.4, 0.0]
+        ]).build();
+
+    let _output_spikes = snn.process(&[[1,0]]);
+
+}

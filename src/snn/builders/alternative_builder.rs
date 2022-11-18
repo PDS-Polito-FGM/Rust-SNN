@@ -2,14 +2,14 @@ use crate::neuron::Neuron;
 use crate::snn::dyn_snn::DynSNN;
 use crate::snn::layer::Layer;
 
-#[derive( Clone)]
+#[derive(Clone)]
 pub struct DynSnnParams<N: Neuron> {
     pub input_dimensions: usize,            /* dimension of the network input layer */
     pub neurons: Vec<Vec<N>>,               /* neurons per each layer */
     pub extra_weights: Vec<Vec<Vec<f64>>>,  /* (positive) weights between layers */
     pub intra_weights: Vec<Vec<Vec<f64>>>,  /* (negative) weights inside the same layer */
 }
-#[derive( Clone)]
+#[derive(Clone)]
 pub struct DynSnnBuilder<N: Neuron> {
     params: DynSnnParams<N>
 }
@@ -29,6 +29,7 @@ impl<N: Neuron + Clone> DynSnnBuilder<N> {
     pub fn get_params(&self) -> DynSnnParams<N> {
         self.params.clone()
     }
+
     pub fn add_layer(self, neurons: Vec<N>, extra_weights: Vec<Vec<f64>>, intra_weights: Vec<Vec<f64>>) -> Self {
         let mut params = self.params;
         params.neurons.push(neurons);
@@ -36,6 +37,7 @@ impl<N: Neuron + Clone> DynSnnBuilder<N> {
         params.intra_weights.push(intra_weights);
         Self { params }
     }
+
     pub fn build(self) -> DynSNN<N> {
         if  self.params.neurons.len() != self.params.extra_weights.len() &&
             self.params.neurons.len() != self.params.intra_weights.len() {
@@ -61,6 +63,5 @@ impl<N: Neuron + Clone> DynSnnBuilder<N> {
 
         DynSNN::new(layers)
     }
-
 
 }

@@ -30,7 +30,7 @@ fn verify_neuron(lif_neuron: &LifNeuron, v_th: f64, v_rest: f64, v_reset: f64, t
 
 #[test]
 fn test_add_one_layer() {
-
+    #[rustfmt::skip]
 
     let snn = DynSnnBuilder::<LifNeuron>::new(0)
             .add_layer(vec![], vec![], vec![])
@@ -334,6 +334,8 @@ fn test_complete_snn() {
         [0.0, -0.62],
         [-0.12, 0.0]
     ]);
+
+    assert_eq!(snn.get_layers_number(),2);
 
 }
 

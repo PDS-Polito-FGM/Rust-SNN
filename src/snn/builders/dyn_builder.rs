@@ -8,6 +8,7 @@ pub struct DynSnnParams<N: Neuron> {
     pub neurons: Vec<Vec<N>>,               /* neurons per each layer */
     pub extra_weights: Vec<Vec<Vec<f64>>>,  /* (positive) weights between layers */
     pub intra_weights: Vec<Vec<Vec<f64>>>,  /* (negative) weights inside the same layer */
+    pub num_layers: usize,
 }
 #[derive(Clone)]
 pub struct DynSnnBuilder<N: Neuron> {
@@ -15,13 +16,14 @@ pub struct DynSnnBuilder<N: Neuron> {
 }
 
 impl<N: Neuron + Clone> DynSnnBuilder<N> {
-    pub fn new(input_dimension : usize) -> Self {
+    pub fn new() -> Self {
         Self {
             params: DynSnnParams {
-                input_dimensions: input_dimension,
+                input_dimensions: 0,
                 neurons: vec![],
                 extra_weights: vec![],
-                intra_weights: vec![]
+                intra_weights: vec![],
+                num_layers: 0
             }
         }
     }
@@ -30,11 +32,15 @@ impl<N: Neuron + Clone> DynSnnBuilder<N> {
         self.params.clone()
     }
 
-    pub fn add_layer(self, neurons: Vec<N>, extra_weights: Vec<Vec<f64>>, intra_weights: Vec<Vec<f64>>) -> Self {
+    pub fn add_layer(mut self, neurons: Vec<N>, extra_weights: Vec<Vec<f64>>, intra_weights: Vec<Vec<f64>>) -> Self {
+        if self.params.num_layers == 0 {
+            self.params.input_dimensions = neurons.len();
+        }
         let mut params = self.params;
         params.neurons.push(neurons);
         params.extra_weights.push(extra_weights);
         params.intra_weights.push(intra_weights);
+        params.num_layers += 1;
         Self { params }
     }
 

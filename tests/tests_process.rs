@@ -56,11 +56,10 @@ fn test_process_snn_with_only_one_layer() {
 }
 
 #[test]
-#[ignore]
 fn test_process_dyn_snn_with_only_one_layer() {
     #[rustfmt::skip]
 
-    let mut snn = DynSnnBuilder::new(2)
+    let mut snn = DynSnnBuilder::new()
         .add_layer(vec![
             LifNeuron::new(0.3, 0.05, 0.1, 1.0),
             LifNeuron::new(0.3, 0.05, 0.1, 1.0),
@@ -214,11 +213,10 @@ fn test_process_snn_with_more_than_one_layer_and_different_neurons() {
 }
 
 #[test]
-#[ignore]
 fn test_process_dyn_snn_with_more_than_one_layer_and_different_neurons() {
     #[rustfmt::skip]
 
-    let mut snn = DynSnnBuilder::new(2)
+    let mut snn = DynSnnBuilder::new()
         .add_layer(vec![
             LifNeuron::new(0.5, 0.1, 0.2, 0.7),
             LifNeuron::new(0.3, 0.05, 0.1, 1.0)], vec![
@@ -427,11 +425,10 @@ fn test_input_spikes_greater_than_one() {
 
 #[test]
 #[should_panic]
-#[ignore]
 fn test_dyn_snn_input_spikes_greater_than_one() {
     #[rustfmt::skip]
 
-    let mut snn = DynSnnBuilder::new(2)
+    let mut snn = DynSnnBuilder::new()
         .add_layer(vec![
             LifNeuron::new(0.3, 0.05, 0.84, 1.0),
             LifNeuron::new(0.3, 0.87, 0.12, 0.89)], vec![

@@ -30,8 +30,7 @@ impl<N: Neuron + Clone> DynSNN<N> {
         let output_spike_events = self.process_events(input_spike_events);
         println!("output_spike_events: {:?}", output_spike_events);
         // * decode output into array shape *
-        let decoded_output =  self.decode_spikes(output_spike_events);
-
+        let decoded_output =  self.decode_spikes(output_spike_events, SPIKES_DURATION);
         decoded_output
     }
 
@@ -56,8 +55,7 @@ impl<N: Neuron + Clone> DynSNN<N> {
         spike_events
     }
 
-    fn decode_spikes(&self ,spikes: Vec<SpikeEvent>) -> Vec<Vec<u8>> {
-        let spikes_duration = spikes.iter().next().unwrap().spikes.len();
+    fn decode_spikes(&self ,spikes: Vec<SpikeEvent>, spikes_duration:usize) -> Vec<Vec<u8>> {
         let output_dimension = self.layers.last().unwrap().get_neurons_number();
         let mut result  = vec![vec![0; spikes_duration];  output_dimension];
         for spike_event in spikes {

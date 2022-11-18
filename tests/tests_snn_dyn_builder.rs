@@ -35,7 +35,7 @@ fn verify_neuron(lif_neuron: &LifNeuron, v_th: f64, v_rest: f64, v_reset: f64, t
 fn test_add_one_layer() {
     #[rustfmt::skip]
 
-    let snn = DynSnnBuilder::<LifNeuron>::new(0)
+    let snn = DynSnnBuilder::<LifNeuron>::new()
             .add_layer(vec![], vec![], vec![])
             .build();
 
@@ -47,7 +47,7 @@ fn test_add_one_layer() {
 fn test_add_more_than_one_layer() {
     #[rustfmt::skip]
 
-    let snn = DynSnnBuilder::<LifNeuron>::new(0)
+    let snn = DynSnnBuilder::<LifNeuron>::new()
             .add_layer(vec![], vec![], vec![])
             .add_layer(vec![], vec![], vec![])
             .add_layer(vec![], vec![], vec![])
@@ -62,7 +62,7 @@ fn test_add_more_than_one_layer() {
 fn test_add_weights_to_layers() {
     #[rustfmt::skip]
 
-    let snn_params = DynSnnBuilder::<LifNeuron>::new(3)
+    let snn_params = DynSnnBuilder::<LifNeuron>::new()
         .add_layer(vec![
             LifNeuron::new(0.3, 0.05, 0.1, 1.0),
             LifNeuron::new(0.3, 0.05, 0.1, 1.0)], vec![
@@ -95,7 +95,7 @@ fn test_add_weights_to_layers() {
 fn test_layer_with_one_neuron() {
     #[rustfmt::skip]
 
-    let snn_params = DynSnnBuilder::<LifNeuron>::new(5)
+    let snn_params = DynSnnBuilder::<LifNeuron>::new()
         .add_layer(vec![
             LifNeuron::new(0.12, 0.8, 0.03, 0.64)], vec![
             vec![0.3, 0.5, 0.1, 0.6, 0.3]], vec![
@@ -121,7 +121,7 @@ fn test_layer_with_one_neuron() {
 fn test_neurons_with_same_parameters() {
     #[rustfmt::skip]
 
-let snn_params = DynSnnBuilder::<LifNeuron>::new(5)
+let snn_params = DynSnnBuilder::<LifNeuron>::new()
         .add_layer(vec![
             LifNeuron::new(0.12, 0.8, 0.03, 0.64),
             LifNeuron::new(0.12, 0.8, 0.03, 0.64)], vec![
@@ -152,7 +152,7 @@ let snn_params = DynSnnBuilder::<LifNeuron>::new(5)
 fn test_layer_with_more_than_one_neuron() {
     #[rustfmt::skip]
 
-    let snn_params = DynSnnBuilder::<LifNeuron>::new(5)
+    let snn_params = DynSnnBuilder::<LifNeuron>::new()
         .add_layer(vec![
             LifNeuron::new(0.127, 0.46, 0.78, 0.67),
             LifNeuron::new(0.12, 0.22, 0.31, 0.47),
@@ -194,7 +194,7 @@ fn test_layer_with_more_than_one_neuron() {
 fn test_intra_layer_weights_with_one_neuron() {
     #[rustfmt::skip]
 
-    let snn_params = DynSnnBuilder::<LifNeuron>::new(5)
+    let snn_params = DynSnnBuilder::<LifNeuron>::new()
         .add_layer(vec![
             LifNeuron::new(0.12, 0.1, 0.03, 0.98)], vec![
             vec![0.3, 0.5, 0.1, 0.6, 0.3]], vec![
@@ -220,7 +220,7 @@ fn test_intra_layer_weights_with_one_neuron() {
 fn test_intra_layer_weights_with_more_than_one_neuron() {
     #[rustfmt::skip]
 
-    let snn_params = DynSnnBuilder::<LifNeuron>::new(5)
+    let snn_params = DynSnnBuilder::<LifNeuron>::new()
         .add_layer(vec![
             LifNeuron::new(0.127, 0.12, 0.78, 0.67),
             LifNeuron::new(0.12, 0.22, 0.31, 0.47),
@@ -262,7 +262,7 @@ fn test_intra_layer_weights_with_more_than_one_neuron() {
 fn test_complete_snn() {
     #[rustfmt::skip]
 
-    let snn = DynSnnBuilder::<LifNeuron>::new(5)
+    let snn = DynSnnBuilder::<LifNeuron>::new()
         .add_layer(vec![
             LifNeuron::new(0.1, 0.1, 0.23, 0.45),
             LifNeuron::new(0.3, 0.12, 0.54, 0.23),
@@ -354,7 +354,7 @@ fn test_complete_snn() {
 fn test_snn_with_negative_weights() {
     #[rustfmt::skip]
 
-    let _snn = DynSnnBuilder::<LifNeuron>::new(2)
+    let _snn = DynSnnBuilder::<LifNeuron>::new()
         .add_layer(vec![
             LifNeuron::new(0.3, 0.05, 0.1, 1.0)
         ], vec![
@@ -371,7 +371,7 @@ fn test_snn_with_negative_weights() {
 fn test_snn_with_weights_greater_than_one() {
     #[rustfmt::skip]
 
-    let _snn = DynSnnBuilder::<LifNeuron>::new(2)
+    let _snn = DynSnnBuilder::<LifNeuron>::new()
         .add_layer(vec![
             LifNeuron::new(0.45, 0.7, 0.1, 0.6)
         ], vec![
@@ -388,7 +388,7 @@ fn test_snn_with_weights_greater_than_one() {
 fn test_snn_with_positive_intra_weights() {
     #[rustfmt::skip]
 
-    let _snn = DynSnnBuilder::<LifNeuron>::new(2)
+    let _snn = DynSnnBuilder::<LifNeuron>::new()
         .add_layer(vec![
             LifNeuron::new(0.3, 0.05, 0.1, 1.0),
             LifNeuron::new(0.3, 0.05, 0.1, 1.0)
@@ -408,7 +408,7 @@ fn test_snn_with_positive_intra_weights() {
 fn test_snn_with_intra_weights_greater_than_one() {
     #[rustfmt::skip]
 
-    let _snn = DynSnnBuilder::<LifNeuron>::new(2)
+    let _snn = DynSnnBuilder::<LifNeuron>::new()
         .add_layer(vec![
             LifNeuron::new(0.1, 0.05, 0.1, 1.0),
             LifNeuron::new(0.3, 0.23, 0.1, 0.89)

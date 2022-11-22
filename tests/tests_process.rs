@@ -254,7 +254,7 @@ fn test_process_dyn_snn_with_more_than_one_layer_and_different_neurons() {
 }
 
 #[test]
-fn test_process_snn_with_different_neurons() {
+fn test_process_snn_with_different_neurons_and_more_than_five_input_spikes() {
     #[rustfmt::skip]
 
     let mut snn = SnnBuilder::new()
@@ -281,7 +281,7 @@ fn test_process_snn_with_different_neurons() {
 
     assert_eq!(output_spikes, output_expected);
 
-    print_output("test_process_snn_with_different_neurons", output_spikes.iter().map(|x| x.to_vec()).collect());
+    print_output("test_process_snn_with_different_neurons_and_more_than_five_input_spikes", output_spikes.iter().map(|x| x.to_vec()).collect());
 
 }
 
@@ -373,7 +373,7 @@ fn test_process_snn_with_only_one_input() {
 }
 
 #[test]
-fn test_process_snn_with_zero_weights() {
+fn test_process_snn_with_all_zeros_as_extra_weights() {
     #[rustfmt::skip]
 
         let mut snn = SnnBuilder::new()
@@ -387,9 +387,9 @@ fn test_process_snn_with_zero_weights() {
             LifNeuron::new(0.3, 0.05, 0.1, 1.0),
             LifNeuron::new(0.3, 0.05, 0.1, 1.0),
         ]).intra_weights([
-            [0.0, 0.0, 0.0],
-            [0.0, 0.0, 0.0],
-            [0.0, 0.0, 0.0]
+            [0.0, -0.5, -0.6],
+            [-0.3, 0.0, -0.2],
+            [-0.7, -0.3, 0.0]
         ]).build();
 
     let output_spikes = snn.process(&[[1,1,0],[0,1,0],[0,1,1],[0,0,1]]);
@@ -397,7 +397,36 @@ fn test_process_snn_with_zero_weights() {
 
     assert_eq!(output_spikes, output_expected);
 
-    print_output("test_process_snn_with_zero_weights", output_spikes.iter().map(|x| x.to_vec()).collect());
+    print_output("test_process_snn_with_all_zeros_as_extra_weights", output_spikes.iter().map(|x| x.to_vec()).collect());
+
+}
+
+#[test]
+fn test_process_snn_with_all_zeros_as_intra_weights() {
+    #[rustfmt::skip]
+
+        let mut snn = SnnBuilder::new()
+        .add_layer()
+        .weights([
+            [0.4, 0.2, 0.4, 0.6],
+            [0.7, 0.3, 0.5, 0.8],
+            [0.1, 0.2, 0.7, 0.9]
+        ]).neurons([
+        LifNeuron::new(0.3, 0.05, 0.1, 1.0),
+        LifNeuron::new(0.3, 0.05, 0.1, 1.0),
+        LifNeuron::new(0.3, 0.05, 0.1, 1.0),
+    ]).intra_weights([
+        [0.0, 0.0, 0.0],
+        [0.0, 0.0, 0.0],
+        [0.0, 0.0, 0.0]
+    ]).build();
+
+    let output_spikes = snn.process(&[[1,1,0],[0,1,0],[0,1,1],[0,0,1]]);
+    let output_expected: [[u8; 3]; 3] = [[1,1,1],[1,1,1],[0,1,1]];
+
+    assert_eq!(output_spikes, output_expected);
+
+    print_output("test_process_snn_with_all_zeros_as_intra_weights", output_spikes.iter().map(|x| x.to_vec()).collect());
 
 }
 

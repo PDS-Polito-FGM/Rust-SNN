@@ -69,10 +69,10 @@ impl<N: Neuron + Clone + Send + 'static, const NET_INPUT_DIM: usize, const NET_O
         for layer in &mut self.layers {
             let (layer_tx, next_layer_rc) = channel::<SpikeEvent>();
 
-            let static_layer = Box::leak(Box::new(layer.clone()));
+            let mut layer_clone = layer.clone();
 
             let thread = thread::spawn(move || {
-                static_layer.process(layer_rc, layer_tx);
+                layer_clone.process(layer_rc, layer_tx);
             });
 
             threads.push(thread);   // push the new thread into threads' pool

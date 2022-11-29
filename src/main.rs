@@ -68,22 +68,22 @@ fn write_to_output_file<const N_NEURONS: usize, const N_INSTANTS: usize>(output_
     let path_output = "outputCounters.txt";
     let mut output_file = File::create(path_output).expect("Something went wrong opening the file outputCounters.txt!");
 
-    let mut output_to_file: [[u8; N_NEURONS]; N_INSTANTS] = [[0; N_NEURONS]; N_INSTANTS];
+    let mut neurons_sum: [u32; N_NEURONS] = [0; N_NEURONS];
 
-    for i in 0..N_INSTANTS {
-        for j in 0..N_NEURONS {
-            output_to_file[i][j] = output_spikes[j][i];
+    println!("Computing sum of the spikes for each neuron...");
+
+    for i in 0..N_NEURONS {
+        for j in 0..N_INSTANTS {
+            neurons_sum[i] += output_spikes[i][j] as u32;
         }
     }
 
-    println!("Writing output spikes to file outputCounters.txt...");
+    println!("Done!");
 
-    for i in 0..N_INSTANTS {
-        let mut output_line = String::new();
-        for j in 0..N_NEURONS {
-            output_line.push_str(&output_to_file[i][j].to_string());
-        }
-        output_file.write(output_line.as_bytes()).expect("Something went wrong writing to the file outputCounters.txt!");
+    println!("Writing data into file outputCounters.txt...");
+
+    for i in 0..N_NEURONS {
+        output_file.write_all(format!("{}\n", neurons_sum[i]).as_bytes()).expect("Something went wrong writing into the file outputCounters.txt!");
     }
 
     println!("Done!");

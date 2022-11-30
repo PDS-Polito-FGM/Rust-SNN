@@ -54,6 +54,8 @@ numberOfCycles = 2
 # Loop over the whole dataset
 for i in range(numberOfCycles):
 
+    print("\n")
+
     # Translate each pixel into a sequence of spikes
     spikesTrains = imgToSpikeTrain(imgArray[i], dt, computationSteps, inputIntensity, rng)
 

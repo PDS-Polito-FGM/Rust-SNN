@@ -60,8 +60,7 @@ fn read_input_spikes<const N_INSTANTS: usize, const N_INPUTS: usize>() -> [[u8; 
         let mut j = 0;
         let chars = line.unwrap()
                                 .chars()
-                                .map(| ch| ch.to_digit(10).unwrap())
-                                .map(|ch| ch as u8)
+                                .map(| ch| (ch.to_digit(10).unwrap()) as u8)
                                 .collect::<Vec<u8>>();
         chars.into_iter().for_each(| ch | {
             input_spikes[j][i] = ch;

@@ -49,12 +49,12 @@ with open(assignmentsFile, 'rb') as fp:
 # Import dataset
 imgArray, labelsArray = loadDataset(images, labels)
 
-numberOfCycles = 2
+numberOfCycles = 101
 
 # Loop over the whole dataset
 for i in range(numberOfCycles):
 
-    print("\n")
+    print("\nIteration: ", i+1)
 
     # Translate each pixel into a sequence of spikes
     spikesTrains = imgToSpikeTrain(imgArray[i], dt, computationSteps, inputIntensity, rng)
@@ -97,4 +97,4 @@ for i in range(numberOfCycles):
     countersEvolution[i % updateInterval] = outputCounters
 
     accuracies = computePerformance(i, updateInterval, countersEvolution, labelsArray, assignments, accuracies)
-    print(accuracies)
+

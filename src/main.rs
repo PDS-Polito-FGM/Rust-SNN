@@ -58,10 +58,7 @@ fn read_input_spikes<const N_INSTANTS: usize, const N_INPUTS: usize>() -> [[u8; 
 
     for line in buffered.lines() {
         let mut j = 0;
-        let chars = line.unwrap()
-                                .chars()
-                                .map(| ch| (ch.to_digit(10).unwrap()) as u8)
-                                .collect::<Vec<u8>>();
+        let chars = convert_line_into_u8(line.unwrap());
         chars.into_iter().for_each(| ch | {
             input_spikes[j][i] = ch;
             j += 1;
@@ -101,4 +98,10 @@ fn write_to_output_file<const N_NEURONS: usize, const N_INSTANTS: usize>(output_
 
     println!("{}","Done!".green());
 
+}
+
+fn convert_line_into_u8(line: String) -> Vec<u8> {
+       line.chars()
+            .map(|ch| (ch.to_digit(10).unwrap()) as u8)
+            .collect::<Vec<u8>>()
 }

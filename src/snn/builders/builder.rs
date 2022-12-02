@@ -2,7 +2,7 @@
 
 use crate::snn::layer::Layer;
 use crate::snn::neuron::Neuron;
-use crate::snn::SNN;
+use crate::snn::snn::SNN;
 
 
 /** Object containing the configuration parameters describing the SNN architecture */

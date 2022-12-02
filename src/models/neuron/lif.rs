@@ -1,17 +1,17 @@
 use crate::snn::neuron::Neuron;
 
-// * LIF submodule *
+/* * LIF submodule * */
 
 /**
     Object representing a Neuron in the LIF (Leaky Integrate-and-Fire) model
 */
 #[derive(Debug)]
 pub struct LifNeuron {
-    v_th:    f64,       /* threshold potential  */
-    v_rest:  f64,       /* resting potential    */
-    v_reset: f64,       /* reset potential      */
+    v_th:    f64,       /* threshold potential */
+    v_rest:  f64,       /* resting potential */
+    v_reset: f64,       /* reset potential */
     tau:     f64,
-    v_mem:   f64,       /* membrane potential   */
+    v_mem:   f64,       /* membrane potential */
     ts:      u64,       /* last instant in which receiving at least one spike */
 }
 
@@ -27,7 +27,7 @@ impl LifNeuron {
         }
     }
 
-    //Getters of the neuron object
+    /* Getters of the neuron object parameters */
     pub fn get_v_th(&self) -> f64 {
         self.v_th
     }
@@ -55,27 +55,34 @@ impl LifNeuron {
 }
 
 impl Neuron for LifNeuron {
+
+    /*
+        This function updates the membrane potential of the neuron when it receives at least spike
+    */
     fn compute_v_mem(&mut self, t: u64, extra_weighted_sum: f64, intra_weighted_sum: f64) -> u8 {
         let weighted_sum = extra_weighted_sum + intra_weighted_sum; /* negative contribute */
 
-        // * compute the neuron membrane potential with the LIF formula *
+        /* * compute the neuron membrane potential with the LIF formula * */
 
         let exponent = -(((t - self.ts) as f64) / self.tau);
         self.v_mem = self.v_rest + (self.v_mem - self.v_rest) * exponent.exp() + weighted_sum;
 
-        // * update ts - last instant in which at least one spike (1) is received *
+        /* * update ts - last instant in which at least one spike (1) is received * */
         self.ts = t;
 
         return if self.v_mem > self.v_th {
-            // reset membrane potential
+            /* reset membrane potential */
             self.v_mem = self.v_reset;
-            1   // * fire *
+            1   /* fire */
         } else {
-            0   // not fire
+            0   /* not fire */
         };
     }
 }
 
+/**
+    Traits implementation for the LifNeuron object
+*/
 impl Clone for LifNeuron {
     fn clone(&self) -> Self {
         Self {

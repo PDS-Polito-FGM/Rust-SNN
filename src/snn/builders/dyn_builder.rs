@@ -73,15 +73,8 @@ impl<N: Neuron + Clone> DynSnnBuilder<N> {
     }
 
     pub fn add_layer( self, neurons: Vec<N>, extra_weights: Vec<Vec<f64>>, intra_weights: Vec<Vec<f64>>) -> Self {
-        if self.params.num_layers == 0 {
-            self.check_intra_weights(neurons.len(),&intra_weights);
-            self.check_weights(neurons.len(),&extra_weights);
-        }
-        else {
-            self.check_intra_weights(neurons.len(),&intra_weights);
-            self.check_weights(neurons.len(),&extra_weights);
-        }
-
+        self.check_intra_weights(neurons.len(),&intra_weights);
+        self.check_weights(neurons.len(),&extra_weights);
         let mut params = self.params;
         params.neurons.push(neurons);
         params.extra_weights.push(extra_weights);

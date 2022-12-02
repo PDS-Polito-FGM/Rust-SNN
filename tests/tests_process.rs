@@ -73,7 +73,7 @@ fn test_process_dyn_snn_with_only_one_layer() {
         ])
         .build();
 
-    let output_spikes = snn.process(&[[1,0,1],[0,0,1]]);
+    let output_spikes = snn.process(&vec![vec![1,0,1],vec![0,0,1]]);
     let output_expected: Vec<Vec<u8>> = vec![vec![0,0,0],vec![1,0,1],vec![1,0,1]];
 
     assert_eq!(output_spikes, output_expected);
@@ -244,7 +244,7 @@ fn test_process_dyn_snn_with_more_than_one_layer_and_different_neurons() {
             vec![0.0]])
         .build();
 
-    let output_spikes = snn.process(&[[1,0,1,0],[0,0,1,1]]);
+    let output_spikes = snn.process(&vec![vec![1,0,1,0],vec![0,0,1,1]]);
     let output_expected: Vec<Vec<u8>> = vec![vec![1,0,1,1]];
 
     assert_eq!(output_spikes, output_expected);
@@ -467,7 +467,7 @@ fn test_dyn_snn_input_spikes_greater_than_one() {
             vec![-0.4, 0.0]
         ]).build();
 
-    let _output_spikes = snn.process(&[[0,50],[0,1]]);
+    let _output_spikes = snn.process(&vec![vec![0,50],vec![0,1]]);
 
 }
 
@@ -491,7 +491,7 @@ fn test_dyn_snn_input_spikes_greater_than_input_dimension() {
             vec![-0.4, 0.0]
         ]).build();
 
-    let _output_spikes = snn.process(&[[0,0],[0,1],[1,1]]);
+    let _output_spikes = snn.process(&vec![vec![0,0],vec![0,1],vec![1,1]]);
 
 }
 
@@ -515,6 +515,6 @@ fn test_dyn_snn_input_spikes_lower_than_input_dimension() {
             vec![-0.4, 0.0]
         ]).build();
 
-    let _output_spikes = snn.process(&[[1,0]]);
+    let _output_spikes = snn.process(&vec![vec![1,0]]);
 
 }

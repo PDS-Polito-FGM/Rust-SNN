@@ -21,24 +21,36 @@ impl<N: Neuron + Clone> DynSNN<N> {
         self.layers.clone()
     }
 
-    pub fn process<const SPIKES_DURATION: usize>(&mut self, spikes: &[[u8; SPIKES_DURATION]])
+    pub fn process(&mut self, spikes: &Vec<Vec<u8>>)
                                                  -> Vec<Vec<u8>> {
+        //Check and compute the spikes duration
+        let spikes_duration = self.compute_spikes_duration(spikes);
         // * encode spikes into SpikeEvent(s) *
-        let input_spike_events = self.encode_spikes(spikes);
+        let input_spike_events = self.encode_spikes(spikes, spikes_duration);
         // * process input *
         let output_spike_events = self.process_events(input_spike_events);
         // * decode output into array shape *
-        let decoded_output =  self.decode_spikes(output_spike_events, SPIKES_DURATION);
+        let decoded_output =  self.decode_spikes(output_spike_events, spikes_duration);
         decoded_output
     }
 
-    fn encode_spikes<const SPIKES_DURATION: usize>(&self, spikes: &[[u8; SPIKES_DURATION]]) -> Vec<SpikeEvent> {
+    fn compute_spikes_duration(&self, spikes:&Vec<Vec<u8>>) -> usize {
+        let spike_duration = spikes[0].len();
+        for spike in spikes{
+            if spike.len() != spike_duration {
+                panic!("The number of spikes duration must be equal");
+            }
+        }
+        spike_duration
+    }
+
+    fn encode_spikes(&self, spikes: &Vec<Vec<u8>>,spikes_duration:usize) -> Vec<SpikeEvent> {
         let mut spike_events = Vec::<SpikeEvent>::new();
 
         if spikes.len()!= self.layers[0].get_weights().first().unwrap().len() {
             panic!("The number of input spikes is not coherent with the input layer dimension");
         }
-        for t in 0..SPIKES_DURATION {
+        for t in 0..spikes_duration {
             let mut t_spikes = Vec::<u8>::new();
 
             // retrieve the input spikes for each neuron

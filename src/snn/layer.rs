@@ -6,10 +6,10 @@ use crate::snn::SpikeEvent;
 /* Object representing a Layer of the Spiking Neural Network */
 #[derive(Debug)]
 pub struct Layer<N: Neuron + Clone + Send + 'static> {
-    neurons: Vec<N>,
-    weights: Vec<Vec<f64>>,
-    intra_weights: Vec<Vec<f64>>,
-    prev_output_spikes: Vec<u8>
+    neurons: Vec<N>, /* neurons of the layer */
+    weights: Vec<Vec<f64>>, /* weights between the neurons of the layer and the neurons of the next layer */
+    intra_weights: Vec<Vec<f64>>, /* weights between the neurons of the layer */
+    prev_output_spikes: Vec<u8> /* output spikes of the previous layer */
 }
 
 impl<N: Neuron + Clone + Send + 'static> Layer<N> {
@@ -27,11 +27,10 @@ impl<N: Neuron + Clone + Send + 'static> Layer<N> {
         }
     }
 
-    //Getters of the layer object
+    /* Getters of the layer object */
     pub fn get_neurons_number(&self) -> usize {
         self.neurons.len()
     }
-
     pub fn get_neurons(&self) -> Vec<N> { self.neurons.clone() }
 
     pub fn get_weights(&self) -> Vec<Vec<f64>> {
@@ -41,7 +40,6 @@ impl<N: Neuron + Clone + Send + 'static> Layer<N> {
     pub fn get_intra_weights(&self) -> Vec<Vec<f64>> {
         self.intra_weights.clone()
     }
-
     /** It processes the input SpikeEvent(s) from the previous layer, according to the model
         of the Neurons in the network
         - layer_input_rc: is a channel receiver from the previous layer
@@ -51,7 +49,7 @@ impl<N: Neuron + Clone + Send + 'static> Layer<N> {
 
         while let Ok(input_spike_event) = layer_input_rc.recv() {
 
-            let instant = input_spike_event.ts;
+            let instant = input_spike_event.ts; /* time instant of the input spike */
             let mut output_spikes = Vec::<u8>::with_capacity(self.neurons.len());
             let mut at_least_one_spike = false;
 

@@ -4,6 +4,14 @@ use crate::neuron::Neuron;
 use crate::snn::layer::Layer;
 use crate::SpikeEvent;
 
+/* Dynamic Spiking Neural Network structure */
+
+/**Object representing the Spiking Neural Network itself
+- N: is a generic type representing the Neuron
+
+There aren't generic const variables such as NET_INPUT_DIM, NET_OUTPUT_DIM, etc. because all the
+computations and checks are done at runtime.
+*/
 #[derive(Debug, Clone)]
 pub struct DynSNN <N: Neuron + Clone + 'static>{
     layers: Vec<Layer<N>>
@@ -13,6 +21,7 @@ impl<N: Neuron + Clone> DynSNN<N> {
     pub fn new(layers: Vec<Layer<N>>) -> Self {
         Self { layers }
     }
+    /* Getters */
     pub fn get_layers_number(&self) -> usize {
         self.layers.len()
     }
@@ -20,10 +29,13 @@ impl<N: Neuron + Clone> DynSNN<N> {
     pub fn get_layers(&self) -> Vec<Layer<N>> {
         self.layers.clone()
     }
-
+    /** Spikes contains an array for each input layer's neuron, and each array has the same
+       number of spikes, equal to the duration of the input
+       (spikes is a matrix, one row for each input neuron, and one column for each time instant)
+      This method check  user input at run-time */
     pub fn process(&mut self, spikes: &Vec<Vec<u8>>)
                                                  -> Vec<Vec<u8>> {
-        //Check and compute the spikes duration
+        // * check and compute the spikes duration *
         let spikes_duration = self.compute_spikes_duration(spikes);
         // * encode spikes into SpikeEvent(s) *
         let input_spike_events = self.encode_spikes(spikes, spikes_duration);
@@ -33,7 +45,8 @@ impl<N: Neuron + Clone> DynSNN<N> {
         let decoded_output =  self.decode_spikes(output_spike_events, spikes_duration);
         decoded_output
     }
-
+    /**  This function check if each vector passed in the spikes one contains the same spikes duration.
+    If yes, it returns the duration, otherwise it returns an error */
     fn compute_spikes_duration(&self, spikes:&Vec<Vec<u8>>) -> usize {
         let spike_duration = spikes[0].len();
         for spike in spikes{
@@ -43,7 +56,7 @@ impl<N: Neuron + Clone> DynSNN<N> {
         }
         spike_duration
     }
-
+    /** This function encode the received input in a Vec of **SpikeEvent** to process it. */
     fn encode_spikes(&self, spikes: &Vec<Vec<u8>>,spikes_duration:usize) -> Vec<SpikeEvent> {
         let mut spike_events = Vec::<SpikeEvent>::new();
 

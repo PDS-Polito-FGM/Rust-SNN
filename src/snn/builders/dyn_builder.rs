@@ -116,6 +116,30 @@ impl<N: Neuron + Clone> DynSnnBuilder<N> {
     }
 
     /**
+        It adds a new layer to the network specifying all the parameters requested.
+        - All neurons have the same parameters
+    */
+    pub fn add_layer_with_same_neurons( self, neuron: N, num_neurons: usize, extra_weights: Vec<Vec<f64>>, intra_weights: Vec<Vec<f64>>) -> Self {
+        self.check_intra_weights(num_neurons,&intra_weights);
+        self.check_weights(num_neurons,&extra_weights);
+
+        let mut params = self.params;
+
+        let mut neurons = Vec::with_capacity(num_neurons);
+
+        for _i in 0..num_neurons {
+            neurons.push(neuron.clone());
+        }
+
+        params.neurons.push(neurons);
+        params.extra_weights.push(extra_weights);
+        params.intra_weights.push(intra_weights);
+        params.num_layers += 1;
+
+        Self { params }
+    }
+
+    /**
         Create and initialize the whole dynamic Spiking Neural Network with the characteristics defined so far
         - If the network has no layers, the process panics
     */

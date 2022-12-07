@@ -116,6 +116,22 @@ impl<N: Neuron + Clone + Send + 'static, const NUM_NEURONS: usize, const NET_INP
         self.params.neurons.push(Vec::from(neurons));
         IntraWeightsBuilder::<N, NUM_NEURONS, NET_INPUT_DIM>::new(self.params)
     }
+
+    /**
+        Add an array of (ordered) neurons to the layer
+        - All neurons have the same parameters
+    */
+    pub fn neurons_with_same_parameters(mut self, neuron: N, num_neurons: usize) -> IntraWeightsBuilder<N, NUM_NEURONS, NET_INPUT_DIM> {
+
+        let mut neurons : Vec<N> = Vec::with_capacity(num_neurons);
+
+        for _i in 0..num_neurons {
+            neurons.push(neuron.clone());
+        }
+
+        self.params.neurons.push(neurons);
+        IntraWeightsBuilder::<N, NUM_NEURONS, NET_INPUT_DIM>::new(self.params)
+    }
 }
 
 /* * Intra Weights * */

@@ -123,7 +123,7 @@ fn test_layer_with_one_neuron() {
 }
 
 #[test]
-fn test_neurons_with_same_parameters() {
+fn test_neurons_with_same_parameters1() {
     #[rustfmt::skip]
 
     let snn_params = SnnBuilder::new()
@@ -135,6 +135,37 @@ fn test_neurons_with_same_parameters() {
             LifNeuron::new(0.12, 0.8, 0.03, 0.64),
             LifNeuron::new(0.12, 0.8, 0.03, 0.64)
         ]).intra_weights([
+            [0.0, -0.3],
+            [-0.2, 0.0]
+        ]).get_params();
+
+    let layer_neurons1 = snn_params.neurons.get(0);
+
+    assert_eq!(layer_neurons1.is_some(), true);
+    assert_eq!(layer_neurons1.unwrap().len(), 2);
+
+    let neuron1 = layer_neurons1.unwrap().get(0);
+    let neuron2 = layer_neurons1.unwrap().get(1);
+
+    assert_eq!(neuron1.is_some(), true);
+    assert_eq!(neuron2.is_some(), true);
+
+    assert_eq!(verify_neuron(neuron1.unwrap(), 0.12, 0.8, 0.03, 0.64), true);
+    assert_eq!(verify_neuron(neuron2.unwrap(), 0.12, 0.8, 0.03, 0.64), true);
+
+}
+
+#[test]
+fn test_neurons_with_same_parameters2() {
+    #[rustfmt::skip]
+
+    let snn_params = SnnBuilder::new()
+        .add_layer()
+        .weights([
+            [0.3, 0.5, 0.1, 0.6, 0.3],
+            [0.2, 0.3, 0.1, 0.4, 0.2]
+        ]).neurons_with_same_parameters(LifNeuron::new(0.12, 0.8, 0.03, 0.64),2)
+        .intra_weights([
             [0.0, -0.3],
             [-0.2, 0.0]
         ]).get_params();

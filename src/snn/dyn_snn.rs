@@ -1,3 +1,4 @@
+use std::sync::{Arc, Mutex};
 use std::sync::mpsc::channel;
 use std::thread;
 use crate::neuron::Neuron;
@@ -15,11 +16,11 @@ use crate::SpikeEvent;
 */
 #[derive(Debug, Clone)]
 pub struct DynSNN <N: Neuron + Clone + 'static>{
-    layers: Vec<Layer<N>>
+    layers: Vec<Arc<Mutex<Layer<N>>>>
 }
 
 impl<N: Neuron + Clone> DynSNN<N> {
-    pub fn new(layers: Vec<Layer<N>>) -> Self {
+    pub fn new(layers: Vec<Arc<Mutex<Layer<N>>>>) -> Self {
         Self { layers }
     }
     /* Getters */
@@ -28,8 +29,9 @@ impl<N: Neuron + Clone> DynSNN<N> {
     }
 
     pub fn get_layers(&self) -> Vec<Layer<N>> {
-        self.layers.clone()
+        self.layers.iter().map(|layer| layer.lock().unwrap().clone()).collect()
     }
+
     /**
         Spikes contains an array for each input layer's neuron, and each array has the same
         number of spikes, equal to the duration of the input
@@ -78,10 +80,10 @@ impl<N: Neuron + Clone> DynSNN<N> {
         for layer in &mut self.layers {
             let (layer_tx, next_layer_rc) = channel::<SpikeEvent>();
 
-            let mut layer_clone = layer.clone();
+            let layer = layer.clone();
 
             let thread = thread::spawn(move || {
-                layer_clone.process(layer_rc, layer_tx);
+                layer.lock().unwrap().process(layer_rc, layer_tx);
             });
 
             threads.push(thread);   /* push the new thread into threads' pool */
@@ -125,8 +127,9 @@ impl<N: Neuron + Clone> DynSNN<N> {
         these Vec(s) must have the same length), otherwise panic!()
      */
     fn _process_dyn(&mut self, spikes: Vec<Vec<u8>>) -> Vec<Vec<u8>> {
+
         /* check num of spikes vec(s) */
-        if spikes.len() != self.layers[0].get_neurons_number() {
+        if spikes.len() != self.layers[0].lock().unwrap().get_neurons_number() {
             panic!("Error: number of input spikes must be equal to the number of input neurons");
         }
 
@@ -197,7 +200,7 @@ impl<N: Neuron + Clone> DynSNN<N> {
     fn encode_spikes(&self, spikes: &Vec<Vec<u8>>,spikes_duration:usize) -> Vec<SpikeEvent> {
         let mut spike_events = Vec::<SpikeEvent>::new();
 
-        if spikes.len()!= self.layers[0].get_weights().first().unwrap().len() {
+        if spikes.len()!= self.layers[0].lock().unwrap().get_weights().first().unwrap().len() {
             panic!("The number of input spikes is not coherent with the input layer dimension");
         }
         for t in 0..spikes_duration {
@@ -222,8 +225,12 @@ impl<N: Neuron + Clone> DynSNN<N> {
         This function decodes and returns an output spikes matrix from a Vec of SpikeEvents
      */
     fn decode_spikes(&self ,spikes: Vec<SpikeEvent>, spikes_duration:usize) -> Vec<Vec<u8>> {
-        let output_dimension = self.layers.last().unwrap().get_neurons_number();
+
+        let last_layer = self.layers.last().unwrap().lock().unwrap();
+
+        let output_dimension = last_layer.get_neurons_number();
         let mut result  = vec![vec![0; spikes_duration];  output_dimension];
+
         for spike_event in spikes {
             for (out_neuron_index, spike) in spike_event.spikes.into_iter().enumerate() {
                 result[out_neuron_index][spike_event.ts as usize] = spike;

@@ -1,3 +1,4 @@
+use std::sync::{Arc, Mutex};
 use std::sync::mpsc::channel;
 use std::thread;
 use crate::snn::layer::Layer;
@@ -15,13 +16,13 @@ use crate::snn::SpikeEvent;
  */
 #[derive(Debug)]
 pub struct SNN<N: Neuron + Clone + Send + 'static, const NET_INPUT_DIM: usize, const NET_OUTPUT_DIM: usize> {
-    layers: Vec<Layer<N>>
+    layers: Vec<Arc<Mutex<Layer<N>>>>
 }
 
 impl<N: Neuron + Clone + Send + 'static, const NET_INPUT_DIM: usize, const NET_OUTPUT_DIM: usize>
 SNN<N, NET_INPUT_DIM, NET_OUTPUT_DIM> {
 
-    pub fn new(layers: Vec<Layer<N>>) -> Self {
+    pub fn new(layers: Vec<Arc<Mutex<Layer<N>>>>) -> Self {
         Self { layers }
     }
 
@@ -31,7 +32,7 @@ SNN<N, NET_INPUT_DIM, NET_OUTPUT_DIM> {
     }
 
     pub fn get_layers(&self) -> Vec<Layer<N>> {
-        self.layers.clone()
+        self.layers.iter().map(|layer| layer.lock().unwrap().clone()).collect()
     }
 
     /**
@@ -69,10 +70,10 @@ SNN<N, NET_INPUT_DIM, NET_OUTPUT_DIM> {
         for layer in &mut self.layers {
             let (layer_tx, next_layer_rc) = channel::<SpikeEvent>();
 
-            let mut layer_clone = layer.clone();
+            let layer = layer.clone();
 
             let thread = thread::spawn(move || {
-                layer_clone.process(layer_rc, layer_tx);
+                layer.lock().unwrap().process(layer_rc, layer_tx);
             });
 
             threads.push(thread);   /* push the new thread into threads' pool */

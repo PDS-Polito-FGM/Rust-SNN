@@ -1,5 +1,6 @@
 /* * builder submodule * */
 
+use std::sync::{Arc, Mutex};
 use crate::snn::layer::Layer;
 use crate::snn::neuron::Neuron;
 use crate::snn::snn::SNN;
@@ -205,7 +206,7 @@ impl<N: Neuron + Clone + Send + 'static, const OUTPUT_DIM: usize, const NET_INPU
             panic!("Error: the number of neurons layers does not correspond to the number of weights layers")
         }
 
-        let mut layers: Vec<Layer<N>> = Vec::new();
+        let mut layers: Vec<Arc<Mutex<Layer<N>>>> = Vec::new();
 
         let mut neurons_iter = self.params.neurons.into_iter();
         let mut extra_weights_iter = self.params.extra_weights.into_iter();
@@ -218,7 +219,7 @@ impl<N: Neuron + Clone + Send + 'static, const OUTPUT_DIM: usize, const NET_INPU
 
             /* create and save the new layer */
             let new_layer = Layer::new(layer_neurons, layer_extra_weights, layer_intra_weights);
-            layers.push(new_layer);
+            layers.push(Arc::new(Mutex::new(new_layer)));
         }
 
         SNN::<N, NET_INPUT_DIM, OUTPUT_DIM>::new(layers)

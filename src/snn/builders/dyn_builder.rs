@@ -1,5 +1,6 @@
 /* * dyn_builder submodule * */
 
+use std::sync::{Arc, Mutex};
 use crate::neuron::Neuron;
 use crate::snn::dyn_snn::DynSNN;
 use crate::snn::layer::Layer;
@@ -155,7 +156,7 @@ impl<N: Neuron + Clone> DynSnnBuilder<N> {
             panic!("Error: the number of neurons layers does not correspond to the number of weights layers")
         }
 
-        let mut layers: Vec<Layer<N>> = Vec::new();
+        let mut layers: Vec<Arc<Mutex<Layer<N>>>> = Vec::new();
         let mut neurons_iter = self.params.neurons.into_iter();
         let mut extra_weights_iter = self.params.extra_weights.into_iter();
         let mut intra_weights_iter = self.params.intra_weights.into_iter();
@@ -167,7 +168,7 @@ impl<N: Neuron + Clone> DynSnnBuilder<N> {
 
             /* create and save the new layer */
             let new_layer = Layer::new(layer_neurons, layer_extra_weights, layer_intra_weights);
-            layers.push(new_layer);
+            layers.push(Arc::new(Mutex::new(new_layer)));
         }
 
         DynSNN::new(layers)

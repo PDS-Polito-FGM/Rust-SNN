@@ -1,4 +1,4 @@
-// * Neuron submodule *
+/* * Neuron submodule * */
 
 /**
     Trait for the implementation of all the Neuron models.

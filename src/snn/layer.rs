@@ -1,4 +1,5 @@
-// * private Layer submodule *
+/* * private Layer submodule * */
+
 use crate::snn::neuron::Neuron;
 use std::sync::mpsc::{Receiver, Sender};
 use crate::snn::SpikeEvent;
@@ -6,10 +7,10 @@ use crate::snn::SpikeEvent;
 /* Object representing a Layer of the Spiking Neural Network */
 #[derive(Debug)]
 pub struct Layer<N: Neuron + Clone + Send + 'static> {
-    neurons: Vec<N>,
-    weights: Vec<Vec<f64>>,
-    intra_weights: Vec<Vec<f64>>,
-    prev_output_spikes: Vec<u8>
+    neurons: Vec<N>, /* neurons of the layer */
+    weights: Vec<Vec<f64>>, /* weights between the neurons of the layer and the neurons of the next layer */
+    intra_weights: Vec<Vec<f64>>, /* weights between the neurons of the layer */
+    prev_output_spikes: Vec<u8> /* output spikes of the previous layer */
 }
 
 impl<N: Neuron + Clone + Send + 'static> Layer<N> {
@@ -27,11 +28,10 @@ impl<N: Neuron + Clone + Send + 'static> Layer<N> {
         }
     }
 
-    //Getters of the layer object
+    /* Getters of the layer object */
     pub fn get_neurons_number(&self) -> usize {
         self.neurons.len()
     }
-
     pub fn get_neurons(&self) -> Vec<N> { self.neurons.clone() }
 
     pub fn get_weights(&self) -> Vec<Vec<f64>> {
@@ -41,7 +41,6 @@ impl<N: Neuron + Clone + Send + 'static> Layer<N> {
     pub fn get_intra_weights(&self) -> Vec<Vec<f64>> {
         self.intra_weights.clone()
     }
-
     /** It processes the input SpikeEvent(s) from the previous layer, according to the model
         of the Neurons in the network
         - layer_input_rc: is a channel receiver from the previous layer
@@ -51,18 +50,20 @@ impl<N: Neuron + Clone + Send + 'static> Layer<N> {
 
         while let Ok(input_spike_event) = layer_input_rc.recv() {
 
-            let instant = input_spike_event.ts;
+            let instant = input_spike_event.ts; /* time instant of the input spike */
             let mut output_spikes = Vec::<u8>::with_capacity(self.neurons.len());
             let mut at_least_one_spike = false;
 
-            // * for each neuron compute the intra and the extra weighted sums,
-            //   then retrieve the output spike *
+            /*
+                for each neuron compute the intra and the extra weighted sums,
+                then retrieve the output spike
+            */
             for index in 0..self.neurons.len() {
                 let neuron = &mut self.neurons[index];
                 let mut intra_weighted_sum = 0f64;
                 let mut extra_weighted_sum = 0f64;
 
-                // compute extra weighted sum
+                /* compute extra weighted sum */
                 let extra_weights_pairs =
                     self.weights[index].iter().zip(input_spike_event.spikes.iter());
 
@@ -72,18 +73,18 @@ impl<N: Neuron + Clone + Send + 'static> Layer<N> {
                     }
                 }
 
-                // compute intra weighted sum
+                /* compute intra weighted sum */
                 let intra_weights_pairs =
                     self.intra_weights[index].iter().zip(self.prev_output_spikes.iter());
 
                 for (i, (weight, spike)) in intra_weights_pairs.enumerate() {
-                    // ignore the reflexive link
+                    /* ignore the reflexive link */
                     if i != index && *spike != 0 {
                         intra_weighted_sum += *weight;
                     }
                 }
 
-                // * compute neuron membrane potential and determine if it fires or not *
+                /* compute neuron membrane potential and determine if it fires or not */
                 let neuron_spike = neuron.compute_v_mem(instant, extra_weighted_sum, intra_weighted_sum);
                 output_spikes.push(neuron_spike);
 
@@ -92,14 +93,14 @@ impl<N: Neuron + Clone + Send + 'static> Layer<N> {
                 }
             }
 
-            // save output spikes for later
+            /* save output spikes for later */
             self.prev_output_spikes = output_spikes.clone();
 
-            // * check if at least one neuron fired - if not, not send any spike *
+            /* check if at least one neuron fired - if not, not send any spike */
             if !at_least_one_spike {
                 continue;
             }
-            // at least one neuron fired -> send output spikes to the next layer
+            /* at least one neuron fired -> send output spikes to the next layer */
 
             let output_spike_event = SpikeEvent::new(instant, output_spikes);
 
@@ -107,12 +108,16 @@ impl<N: Neuron + Clone + Send + 'static> Layer<N> {
                 .expect(&format!("Unexpected error sending input spike event t={}", instant));
         }
 
-        // * we don't need to drop the sender, because it will be
-        // automatically dropped when the layer goes out of scope *
+        /*
+            we don't need to drop the sender, because it will be
+            automatically dropped when the layer goes out of scope
+        */
     }
 }
 
-unsafe impl<N: Neuron + Clone> Sync for Layer<N> {}
+/*
+    Traits implementation for the Layer object
+*/
 
 impl<N: Neuron + Clone + Send + 'static> Clone for Layer<N> {
     fn clone(&self) -> Self {
@@ -124,3 +129,5 @@ impl<N: Neuron + Clone + Send + 'static> Clone for Layer<N> {
         }
     }
 }
+
+unsafe impl<N: Neuron + Clone> Sync for Layer<N> {}

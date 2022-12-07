@@ -42,7 +42,7 @@ fn main() {
 
 }
 
-/*
+/**
     This function reads the input spikes from the input file and returns a 2D array of u8.
 */
 fn read_input_spikes<const N_INSTANTS: usize, const N_INPUTS: usize>() -> [[u8; N_INSTANTS]; N_INPUTS] {
@@ -71,7 +71,7 @@ fn read_input_spikes<const N_INSTANTS: usize, const N_INPUTS: usize>() -> [[u8; 
     input_spikes
 }
 
-/*
+/**
     This function writes the output spikes to the output file.
 */
 fn write_to_output_file<const N_NEURONS: usize, const N_INSTANTS: usize>(output_spikes: [[u8; N_INSTANTS]; N_NEURONS]) -> () {
@@ -100,6 +100,9 @@ fn write_to_output_file<const N_NEURONS: usize, const N_INSTANTS: usize>(output_
 
 }
 
+/**
+    This function converts a line of the input file into a Vec of u8.
+*/
 fn convert_line_into_u8(line: String) -> Vec<u8> {
        line.chars()
             .map(|ch| (ch.to_digit(10).unwrap()) as u8)

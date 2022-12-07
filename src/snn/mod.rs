@@ -1,5 +1,5 @@
 pub mod builders;
-    mod layer; // private
+    mod layer; /* private */
 pub mod neuron;
 mod dyn_snn;
 mod snn;

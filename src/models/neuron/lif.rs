@@ -62,12 +62,12 @@ impl Neuron for LifNeuron {
     fn compute_v_mem(&mut self, t: u64, extra_weighted_sum: f64, intra_weighted_sum: f64) -> u8 {
         let weighted_sum = extra_weighted_sum + intra_weighted_sum; /* negative contribute */
 
-        /* * compute the neuron membrane potential with the LIF formula * */
+        /* compute the neuron membrane potential with the LIF formula */
 
         let exponent = -(((t - self.ts) as f64) / self.tau);
         self.v_mem = self.v_rest + (self.v_mem - self.v_rest) * exponent.exp() + weighted_sum;
 
-        /* * update ts - last instant in which at least one spike (1) is received * */
+        /* update ts - last instant in which at least one spike (1) is received */
         self.ts = t;
 
         return if self.v_mem > self.v_th {
@@ -80,7 +80,7 @@ impl Neuron for LifNeuron {
     }
 }
 
-/**
+/*
     Traits implementation for the LifNeuron object
 */
 impl Clone for LifNeuron {

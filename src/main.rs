@@ -13,6 +13,10 @@ fn main() {
 
     let _input_spikes: [[u8; N_INSTANTS]; N_INPUTS] = read_input_spikes();
 
+    let _thresholds: [f64; N_NEURONS] = read_thresholds();
+
+    let _extra_weights: [[f64; N_NEURONS]; N_NEURONS] = read_extra_weights();
+
     println!("{}","Building the SNN network...".yellow());
 
     let building_start = Instant::now();
@@ -69,6 +73,61 @@ fn read_input_spikes<const N_INSTANTS: usize, const N_INPUTS: usize>() -> [[u8; 
     println!("{}","Done!".green());
 
     input_spikes
+}
+
+/**
+    This function reads the threshold file and returns an array of thresholds
+*/
+fn read_thresholds<const N_NEURONS: usize>() -> [f64; N_NEURONS] {
+    let path_threshold_file = "./networkParameters/thresholdsOut.txt";
+    let input = File::open(path_threshold_file).expect("Something went wrong opening the file thresholdsOut.txt!");
+    let buffered = BufReader::new(input);
+
+    let mut thresholds: [f64; N_NEURONS] = [0f64; N_NEURONS];
+
+    println!("{}","Reading thresholds from file thresholdsOut.txt...".yellow());
+
+    let mut i = 0;
+
+    for line in buffered.lines() {
+
+        thresholds[i] = line.unwrap().parse::<f64>().expect("Cannot parse String into f64!");
+
+        i += 1;
+    }
+
+    println!("{}", "Done!".green());
+
+    thresholds
+}
+
+/**
+    This function reads the weights file and returns a 2D array of weights
+*/
+fn read_extra_weights<const N_NEURONS: usize, const N_INPUTS: usize>() -> [[f64; N_INPUTS]; N_NEURONS] {
+    let path_weights_file = "./networkParameters/weightsOut.txt";
+    let input = File::open(path_weights_file).expect("Something went wrong opening the file weightsOut.txt!");
+    let buffered = BufReader::new(input);
+
+    let mut extra_weights: [[f64; N_INPUTS]; N_NEURONS] = [[0f64; N_INPUTS]; N_NEURONS];
+
+    println!("{}","Reading weights from file weightsOut.txt...".yellow());
+
+    let mut i = 0;
+
+    for line in buffered.lines() {
+        let split: Vec<String> = line.unwrap().as_str().split(" ").map(|el| el.to_string()).collect::<Vec<String>>();
+
+        for j in 0..N_INPUTS {
+            extra_weights[i][j] = split[j].parse::<f64>().expect("Cannot parse string into f64!");
+        }
+
+        i += 1;
+    }
+
+    println!("{}", "Done!".green());
+
+    extra_weights
 }
 
 /**

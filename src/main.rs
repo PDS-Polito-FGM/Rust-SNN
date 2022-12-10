@@ -13,19 +13,28 @@ fn main() {
 
     let _input_spikes: [[u8; N_INSTANTS]; N_INPUTS] = read_input_spikes();
 
-    let _thresholds: [f64; N_NEURONS] = read_thresholds();
+    let neurons: [LifNeuron; N_NEURONS] = build_neurons();
 
-    let _extra_weights: [[f64; N_NEURONS]; N_NEURONS] = read_extra_weights();
+    let extra_weights: [[f64; N_NEURONS]; N_NEURONS] = read_extra_weights();
+
+    let intra_weights: [[f64; N_NEURONS]; N_NEURONS] = build_intra_weights();
 
     println!("{}","Building the SNN network...".yellow());
 
     let building_start = Instant::now();
 
-    //TODO: Build the SNN network - Francesco
+    let _snn = SnnBuilder::new()
+        .add_layer()
+        .weights(extra_weights)
+        .neurons(neurons)
+        .intra_weights(intra_weights)
+        .build();
 
     let building_end = building_start.elapsed();
 
     println!("{}","Done!".green());
+
+    println!("{:?}", _snn);
 
     println!("{}",format!("\nTime elapsed in building the network: {}.{:03} seconds\n", building_end.as_secs(), building_end.subsec_millis()).blue());
 
@@ -44,6 +53,59 @@ fn main() {
     let _output_spikes: [[u8; N_INSTANTS]; N_NEURONS] = [[0; N_INSTANTS]; N_NEURONS];
     write_to_output_file(_output_spikes);
 
+}
+
+/* * USEFUL FUNCTIONS * */
+
+/**
+    This function builds the neurons of the network.
+*/
+fn build_neurons<const N_NEURONS: usize>() -> [LifNeuron; N_NEURONS] {
+
+    let thresholds: [f64; N_NEURONS] = read_thresholds();
+
+    let v_rest: f64 = -65.0;
+    let v_reset: f64 = -60.0;
+    let tau: f64 = 100.0;
+
+    let mut neurons: Vec<LifNeuron> = Vec::with_capacity(N_NEURONS);
+
+    for i in 0..N_NEURONS {
+
+        let neuron = LifNeuron::new(thresholds[i], v_rest, v_reset, tau);
+
+        neurons.push(neuron);
+    }
+
+    println!("{:?}", neurons);
+
+    neurons.try_into().unwrap()
+}
+
+/**
+    This function builds a 2D array of intra weights
+*/
+fn build_intra_weights<const N_NEURONS: usize>() -> [[f64; N_NEURONS]; N_NEURONS] {
+
+    let value: f64 = -15.0;
+
+    let mut intra_weights: [[f64; N_NEURONS]; N_NEURONS] = [[0f64; N_NEURONS]; N_NEURONS];
+
+    println!("{}","Computing intra weights...".yellow());
+
+    for i in 0..N_NEURONS {
+        for j in 0..N_NEURONS {
+            if i == j {
+                intra_weights[i][j] = 0.0;
+            } else {
+                intra_weights[i][j] = value;
+            }
+        }
+    }
+
+    println!("{}", "Done!".green());
+
+    intra_weights
 }
 
 /**
@@ -76,32 +138,6 @@ fn read_input_spikes<const N_INSTANTS: usize, const N_INPUTS: usize>() -> [[u8; 
 }
 
 /**
-    This function reads the threshold file and returns an array of thresholds
-*/
-fn read_thresholds<const N_NEURONS: usize>() -> [f64; N_NEURONS] {
-    let path_threshold_file = "./networkParameters/thresholdsOut.txt";
-    let input = File::open(path_threshold_file).expect("Something went wrong opening the file thresholdsOut.txt!");
-    let buffered = BufReader::new(input);
-
-    let mut thresholds: [f64; N_NEURONS] = [0f64; N_NEURONS];
-
-    println!("{}","Reading thresholds from file thresholdsOut.txt...".yellow());
-
-    let mut i = 0;
-
-    for line in buffered.lines() {
-
-        thresholds[i] = line.unwrap().parse::<f64>().expect("Cannot parse String into f64!");
-
-        i += 1;
-    }
-
-    println!("{}", "Done!".green());
-
-    thresholds
-}
-
-/**
     This function reads the weights file and returns a 2D array of weights
 */
 fn read_extra_weights<const N_NEURONS: usize, const N_INPUTS: usize>() -> [[f64; N_INPUTS]; N_NEURONS] {
@@ -128,6 +164,32 @@ fn read_extra_weights<const N_NEURONS: usize, const N_INPUTS: usize>() -> [[f64;
     println!("{}", "Done!".green());
 
     extra_weights
+}
+
+/**
+    This function reads the threshold file and returns an array of thresholds
+*/
+fn read_thresholds<const N_NEURONS: usize>() -> [f64; N_NEURONS] {
+    let path_threshold_file = "./networkParameters/thresholdsOut.txt";
+    let input = File::open(path_threshold_file).expect("Something went wrong opening the file thresholdsOut.txt!");
+    let buffered = BufReader::new(input);
+
+    let mut thresholds: [f64; N_NEURONS] = [0f64; N_NEURONS];
+
+    println!("{}","Reading thresholds from file thresholdsOut.txt...".yellow());
+
+    let mut i = 0;
+
+    for line in buffered.lines() {
+
+        thresholds[i] = line.unwrap().parse::<f64>().expect("Cannot parse String into f64!");
+
+        i += 1;
+    }
+
+    println!("{}", "Done!".green());
+
+    thresholds
 }
 
 /**

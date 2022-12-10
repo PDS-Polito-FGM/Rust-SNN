@@ -2,7 +2,7 @@ use std::fs::File;
 use std::io::{BufRead, BufReader, Write};
 use std::time::Instant;
 use colored::Colorize;
-use pds_snn::builders::{SnnBuilder};
+use pds_snn::builders::{SnnBuilder, DynSnnBuilder};
 use pds_snn::models::neuron::lif::LifNeuron;
 
 fn main() {
@@ -23,18 +23,26 @@ fn main() {
 
     let building_start = Instant::now();
 
+    /* SNN network */
+    /*
     let _snn = SnnBuilder::new()
         .add_layer()
         .weights(extra_weights)
         .neurons(neurons)
         .intra_weights(intra_weights)
         .build();
+     */
+
+    /*  Dynamic SNN network  */
+    let _snn = DynSnnBuilder::new(N_INPUTS)
+        .add_layer(neurons.to_vec(),
+                   extra_weights.map(|el| el.to_vec()).to_vec(),
+                   intra_weights.map(|el| el.to_vec()).to_vec())
+        .build();
 
     let building_end = building_start.elapsed();
 
     println!("{}","Done!".green());
-
-    println!("{:?}", _snn);
 
     println!("{}",format!("\nTime elapsed in building the network: {}.{:03} seconds\n", building_end.as_secs(), building_end.subsec_millis()).blue());
 
@@ -76,8 +84,6 @@ fn build_neurons<const N_NEURONS: usize>() -> [LifNeuron; N_NEURONS] {
 
         neurons.push(neuron);
     }
-
-    println!("{:?}", neurons);
 
     neurons.try_into().unwrap()
 }

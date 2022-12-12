@@ -68,12 +68,16 @@ fn build_neurons(n_neurons: usize) -> Vec<LifNeuron> {
 
     let mut neurons: Vec<LifNeuron> = Vec::with_capacity(n_neurons);
 
+    println!("{}","Building the neurons...".yellow());
+
     for i in 0..n_neurons {
 
         let neuron = LifNeuron::new(thresholds[i], v_rest, v_reset, tau);
 
         neurons.push(neuron);
     }
+
+    println!("{}", "Done!".green());
 
     neurons
 }
@@ -87,7 +91,7 @@ fn build_intra_weights(n_neurons: usize) -> Vec<Vec<f64>> {
 
     let mut intra_weights: Vec<Vec<f64>> = vec![vec![0f64; n_neurons]; n_neurons];
 
-    println!("{}","Computing intra weights...".yellow());
+    println!("{}","Building the intra weights...".yellow());
 
     for i in 0..n_neurons {
         for j in 0..n_neurons {

@@ -1,8 +1,6 @@
 use pds_snn::builders::{DynSnnBuilder, SnnBuilder};
 use pds_snn::models::neuron::lif::LifNeuron;
 
-//TODO: What about the duplicated code and functions? - Francesco
-
 //Function that prints the output spikes obtained from the SNN processing
 fn print_output(test_name: &str, output_spikes: Vec<Vec<u8>>) -> () {
     println!("\nOUTPUT SPIKES for {}:\n",test_name);

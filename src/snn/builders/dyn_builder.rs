@@ -60,8 +60,8 @@ impl<N: Neuron + Clone> DynSnnBuilder<N> {
                 panic!("The number of neurons must be equal to the number of columns of the intra weights matrix");
             }
             for weight in row {
-                if *weight > 0.0 || *weight < -1.0 {
-                    panic!("The intra weights must be negative and in the range [-1, 0]");
+                if *weight > 0.0 {
+                    panic!("The intra weights must be negative");
                 }
             }
         }
@@ -92,8 +92,8 @@ impl<N: Neuron + Clone> DynSnnBuilder<N> {
                 }
             }
             for weight in row {
-                if *weight < 0.0 || *weight > 1.0 {
-                    panic!("The weights must be positive and in the range [0, 1]");
+                if *weight < 0.0 {
+                    panic!("The weights must be positive");
                 }
             }
         }

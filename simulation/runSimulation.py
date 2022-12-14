@@ -49,7 +49,7 @@ with open(assignmentsFile, 'rb') as fp:
 # Import dataset
 imgArray, labelsArray = loadDataset(images, labels)
 
-numberOfCycles = 101
+numberOfCycles = 301
 
 # Loop over the whole dataset
 for i in range(numberOfCycles):

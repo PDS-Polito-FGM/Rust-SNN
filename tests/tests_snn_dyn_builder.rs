@@ -385,22 +385,6 @@ fn test_snn_with_negative_weights() {
 
 #[test]
 #[should_panic]
-fn test_snn_with_weights_greater_than_one() {
-    #[rustfmt::skip]
-
-    let _snn = DynSnnBuilder::<LifNeuron>::new(2)
-        .add_layer(vec![
-            LifNeuron::new(0.45, 0.7, 0.1, 0.6)
-        ], vec![
-            vec![0.2, 1.5]
-        ], vec![
-            vec![0.0]
-        ]).build();
-
-}
-
-#[test]
-#[should_panic]
 fn test_snn_with_positive_intra_weights() {
     #[rustfmt::skip]
 
@@ -413,25 +397,6 @@ fn test_snn_with_positive_intra_weights() {
             vec![0.3, 0.4]
         ], vec![
             vec![0.0, 0.5],
-            vec![-0.05, 0.0]
-        ]).build();
-
-}
-
-#[test]
-#[should_panic]
-fn test_snn_with_intra_weights_greater_than_one() {
-    #[rustfmt::skip]
-
-    let _snn = DynSnnBuilder::<LifNeuron>::new(2)
-        .add_layer(vec![
-            LifNeuron::new(0.1, 0.05, 0.1, 1.0),
-            LifNeuron::new(0.3, 0.23, 0.1, 0.89)
-        ], vec![
-            vec![0.2, 0.5],
-            vec![0.3, 0.4]
-        ], vec![
-            vec![0.0, -1.5],
             vec![-0.05, 0.0]
         ]).build();
 

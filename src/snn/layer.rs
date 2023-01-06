@@ -7,10 +7,10 @@ use crate::snn::SpikeEvent;
 /* Object representing a Layer of the Spiking Neural Network */
 #[derive(Debug)]
 pub struct Layer<N: Neuron + Clone + Send + 'static> {
-    neurons: Vec<N>, /* neurons of the layer */
-    weights: Vec<Vec<f64>>, /* weights between the neurons of the layer and the neurons of the next layer */
-    intra_weights: Vec<Vec<f64>>, /* weights between the neurons of the layer */
-    prev_output_spikes: Vec<u8> /* output spikes of the previous layer */
+    neurons: Vec<N>,                /* neurons of the layer */
+    weights: Vec<Vec<f64>>,         /* weights between the neurons of this layer and the previous one */
+    intra_weights: Vec<Vec<f64>>,   /* weights between the neurons of this layer */
+    prev_output_spikes: Vec<u8>     /* output spikes of the previous instant */
 }
 
 impl<N: Neuron + Clone + Send + 'static> Layer<N> {
@@ -28,10 +28,11 @@ impl<N: Neuron + Clone + Send + 'static> Layer<N> {
         }
     }
 
-    /* Getters of the layer object */
+    /* Getters  */
     pub fn get_neurons_number(&self) -> usize {
         self.neurons.len()
     }
+
     pub fn get_neurons(&self) -> Vec<N> { self.neurons.clone() }
 
     pub fn get_weights(&self) -> Vec<Vec<f64>> {
@@ -41,16 +42,20 @@ impl<N: Neuron + Clone + Send + 'static> Layer<N> {
     pub fn get_intra_weights(&self) -> Vec<Vec<f64>> {
         self.intra_weights.clone()
     }
-    /** It processes the input SpikeEvent(s) from the previous layer, according to the model
-        of the Neurons in the network
-        - layer_input_rc: is a channel receiver from the previous layer
-        - layer_output_tx: is a channel sender to the next Network Layer
+
+    /** It processes the output SpikeEvent(s) coming from the previous layer,
+        according to the model of the Neurons in the network, and sends
+        the resulting spikes to the next layer.
+        - layer_input_rc: is a channel *receiver* from the previous Layer
+        - layer_output_tx: is a channel *sender* to the next Network Layer
             (or to the SNN itself, if this is the output layer) */
     pub fn process(&mut self, layer_input_rc: Receiver<SpikeEvent>, layer_output_tx: Sender<SpikeEvent>) {
+        /* initialize data structures, so that the SNN can be reused */
+        self.initialize();
 
+        /* listen to SpikeEvent(s) coming from the previous layer and process them */
         while let Ok(input_spike_event) = layer_input_rc.recv() {
-
-            let instant = input_spike_event.ts; /* time instant of the input spike */
+            let instant = input_spike_event.ts;    /* time instant of the input spike */
             let mut output_spikes = Vec::<u8>::with_capacity(self.neurons.len());
             let mut at_least_one_spike = false;
 
@@ -58,10 +63,9 @@ impl<N: Neuron + Clone + Send + 'static> Layer<N> {
                 for each neuron compute the intra and the extra weighted sums,
                 then retrieve the output spike
             */
-            for index in 0..self.neurons.len() {
-                let neuron = &mut self.neurons[index];
-                let mut intra_weighted_sum = 0f64;
+            for (index, neuron) in self.neurons.iter_mut().enumerate() {
                 let mut extra_weighted_sum = 0f64;
+                let mut intra_weighted_sum = 0f64;
 
                 /* compute extra weighted sum */
                 let extra_weights_pairs =
@@ -73,7 +77,8 @@ impl<N: Neuron + Clone + Send + 'static> Layer<N> {
                     }
                 }
 
-                /* compute intra weighted sum */
+                /* compute intra weighted sum
+                   (intra_weights[index] contains the weights of the links to the current neuron) */
                 let intra_weights_pairs =
                     self.intra_weights[index].iter().zip(self.prev_output_spikes.iter());
 
@@ -84,11 +89,11 @@ impl<N: Neuron + Clone + Send + 'static> Layer<N> {
                     }
                 }
 
-                /* compute neuron membrane potential and determine if it fires or not */
+                /* compute membrane potential and determine if the Neuron fires or not */
                 let neuron_spike = neuron.compute_v_mem(instant, extra_weighted_sum, intra_weighted_sum);
                 output_spikes.push(neuron_spike);
 
-                if !at_least_one_spike && neuron_spike > 0u8 {
+                if !at_least_one_spike && neuron_spike == 1u8 {
                     at_least_one_spike = true;
                 }
             }
@@ -112,6 +117,11 @@ impl<N: Neuron + Clone + Send + 'static> Layer<N> {
             we don't need to drop the sender, because it will be
             automatically dropped when the layer goes out of scope
         */
+    }
+
+    fn initialize(&mut self) {
+        self.prev_output_spikes.clear();    /* reset prev_output_spikes */
+        self.neurons.iter_mut().for_each(|neuron| neuron.initialize());  /* reset neurons */
     }
 }
 

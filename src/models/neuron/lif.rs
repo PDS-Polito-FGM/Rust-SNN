@@ -7,12 +7,14 @@ use crate::snn::neuron::Neuron;
 */
 #[derive(Debug)]
 pub struct LifNeuron {
+    /* const fields */
     v_th:    f64,       /* threshold potential */
     v_rest:  f64,       /* resting potential */
     v_reset: f64,       /* reset potential */
     tau:     f64,
+    /* mutable fields */
     v_mem:   f64,       /* membrane potential */
-    ts:      u64,       /* last instant in which receiving at least one spike */
+    ts:      u64,       /* last instant in which has been received at least one spike */
 }
 
 impl LifNeuron {
@@ -55,19 +57,19 @@ impl LifNeuron {
 }
 
 impl Neuron for LifNeuron {
-
     /*
-        This function updates the membrane potential of the neuron when it receives at least spike
+        This function updates the membrane potential of the neuron when it receives at least one spike
     */
     fn compute_v_mem(&mut self, t: u64, extra_weighted_sum: f64, intra_weighted_sum: f64) -> u8 {
-        let weighted_sum = extra_weighted_sum + intra_weighted_sum; /* negative contribute */
+        let weighted_sum = extra_weighted_sum +    /* positive contribute */
+                                intra_weighted_sum      /* negative contribute */;
 
         /* compute the neuron membrane potential with the LIF formula */
 
         let exponent = -(((t - self.ts) as f64) / self.tau);
         self.v_mem = self.v_rest + (self.v_mem - self.v_rest) * exponent.exp() + weighted_sum;
 
-        /* update ts - last instant in which at least one spike (1) is received */
+        /* update ts - last instant in which at least one positive spike (1) is received */
         self.ts = t;
 
         return if self.v_mem > self.v_th {
@@ -77,6 +79,11 @@ impl Neuron for LifNeuron {
         } else {
             0   /* not fire */
         };
+    }
+
+    fn initialize(&mut self) {
+        self.v_mem = self.v_rest;
+        self.ts = 0u64;
     }
 }
 

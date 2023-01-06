@@ -14,7 +14,7 @@ pub struct DynSnnParams<N: Neuron> {
     pub neurons: Vec<Vec<N>>,               /* neurons per each layer */
     pub extra_weights: Vec<Vec<Vec<f64>>>,  /* (positive) weights between layers */
     pub intra_weights: Vec<Vec<Vec<f64>>>,  /* (negative) weights inside the same layer */
-    pub num_layers: usize,
+    pub num_layers: usize,                  /* number of layers */
 }
 
 /**

@@ -58,13 +58,14 @@ fn build_neurons(n_neurons: usize) -> Vec<LifNeuron> {
     let v_rest: f64 = -65.0;
     let v_reset: f64 = -60.0;
     let tau: f64 = 100.0;
+    let dt: f64 = 0.1;
 
     let mut neurons: Vec<LifNeuron> = Vec::with_capacity(n_neurons);
 
     println!("{}","Building the neurons...".yellow());
 
     for i in 0..n_neurons {
-        let neuron = LifNeuron::new(thresholds[i], v_rest, v_reset, tau);
+        let neuron = LifNeuron::new(thresholds[i], v_rest, v_reset, tau, dt);
         neurons.push(neuron);
     }
 
@@ -101,7 +102,7 @@ fn build_intra_weights(n_neurons: usize) -> Vec<Vec<f64>> {
     This function reads the input spikes from the input file and returns a 2D Vec of u8.
 */
 fn read_input_spikes(n_instants: usize, n_inputs: usize) -> Vec<Vec<u8>> {
-    let path_input = "inputSpikes.txt";
+    let path_input = "./inputSpikes.txt";
     let input = File::open(path_input).expect("Something went wrong opening the file inputSpikes.txt!");
     let buffered = BufReader::new(input);
 
@@ -185,7 +186,7 @@ fn read_thresholds(n_neurons: usize) -> Vec<f64> {
     This function writes the output spikes to the output file.
 */
 fn write_to_output_file(output_spikes: Vec<Vec<u8>>, n_neurons: usize, n_instants: usize) -> () {
-    let path_output = "outputCounters.txt";
+    let path_output = "./outputCounters.txt";
     let mut output_file = File::create(path_output).expect("Something went wrong opening the file outputCounters.txt!");
 
     let mut neurons_sum: Vec<u32> = vec![0; n_neurons];

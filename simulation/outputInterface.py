@@ -41,12 +41,10 @@ def computePerformance(currentIndex, updateInterval, countersEvolution,
 		maxCount = np.zeros(updateInterval)
 
 		# Initialize the output classification
-		classification = -1*np.ones(updateInterval)
+		classification = -1*np.ones(updateInterval, dtype=np.int32)
 
 		labelsSequence = labels[currentIndex - updateInterval :
 				currentIndex]
-		print(labels[currentIndex - updateInterval :
-					currentIndex])
 
 
 		for label in range(10):
@@ -56,7 +54,7 @@ def computePerformance(currentIndex, updateInterval, countersEvolution,
 					label], axis = 1)
 
 
-			# Find where the spikes count is grater than the maximum
+			# Find where the spikes count is greater than the maximum
 			whereMaxSpikes = spikesCount > maxCount
 
 			# Associate the instants to the current label
@@ -65,6 +63,8 @@ def computePerformance(currentIndex, updateInterval, countersEvolution,
 			# Update the maximum number of spikes for the label
 			maxCount[whereMaxSpikes] = spikesCount[whereMaxSpikes]
 
+		# print computed labels
+		print(classification)
 
 		# Compute the accuracy and add it to the list of accuracies
 		accuracies = updateAccuracy(classification, labelsSequence, accuracies)

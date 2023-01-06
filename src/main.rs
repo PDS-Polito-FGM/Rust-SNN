@@ -6,24 +6,23 @@ use pds_snn::builders::DynSnnBuilder;
 use pds_snn::models::neuron::lif::LifNeuron;
 
 fn main() {
-
     let n_neurons: usize = 400;
     let n_inputs: usize = 784;
     let n_instants: usize = 3500;
 
+    /* read input spikes from file (coming from python script) */
     let input_spikes: Vec<Vec<u8>> = read_input_spikes(n_instants, n_inputs);
 
+    /* read neurons' and weights' parameters from config files */
     let neurons: Vec<LifNeuron> = build_neurons(n_neurons);
-
     let extra_weights: Vec<Vec<f64>> = read_extra_weights(n_neurons, n_inputs);
-
     let intra_weights: Vec<Vec<f64>> = build_intra_weights(n_neurons);
 
     println!("{}","Building the SNN network...".yellow());
 
     let building_start = Instant::now();
 
-    /*  Dynamic SNN network  */
+    /*  Build dynamic SNN network  */
     let mut snn = DynSnnBuilder::new(n_inputs)
         .add_layer(neurons, extra_weights, intra_weights)
         .build();
@@ -31,26 +30,21 @@ fn main() {
     let building_end = building_start.elapsed();
 
     println!("{}","Done!".green());
-
     println!("{}",format!("\nTime elapsed in building the network: {}.{:03} seconds\n", building_end.as_secs(), building_end.subsec_millis()).blue());
-
     println!("{}","Computing the output spikes...".yellow());
 
     let computing_start = Instant::now();
 
-    /* calling the dynSNN process function */
-    snn.process(&input_spikes);
+    /* calling the dynSNN process function to process input spikes */
+    let output_spikes = snn.process(&input_spikes);
 
     let computing_end = computing_start.elapsed();
 
     println!("{}","Done!".green());
-
     println!("{}", format!("\nTime elapsed in computing the output spikes: {}.{:03} seconds\n", computing_end.as_secs(), computing_end.subsec_millis()).blue());
 
-    let output_spikes: Vec<Vec<u8>> = vec![vec![0; n_instants]; n_neurons];
-
+    /* write output spikes to file (to pass them to python script) */
     write_to_output_file(output_spikes, n_neurons, n_instants);
-
 }
 
 /* * USEFUL FUNCTIONS * */
@@ -59,7 +53,6 @@ fn main() {
     This function builds the neurons of the network.
 */
 fn build_neurons(n_neurons: usize) -> Vec<LifNeuron> {
-
     let thresholds: Vec<f64> = read_thresholds(n_neurons);
 
     let v_rest: f64 = -65.0;
@@ -71,14 +64,11 @@ fn build_neurons(n_neurons: usize) -> Vec<LifNeuron> {
     println!("{}","Building the neurons...".yellow());
 
     for i in 0..n_neurons {
-
         let neuron = LifNeuron::new(thresholds[i], v_rest, v_reset, tau);
-
         neurons.push(neuron);
     }
 
     println!("{}", "Done!".green());
-
     neurons
 }
 
@@ -86,7 +76,6 @@ fn build_neurons(n_neurons: usize) -> Vec<LifNeuron> {
     This function builds a 2D Vec of intra weights
 */
 fn build_intra_weights(n_neurons: usize) -> Vec<Vec<f64>> {
-
     let value: f64 = -15.0;
 
     let mut intra_weights: Vec<Vec<f64>> = vec![vec![0f64; n_neurons]; n_neurons];
@@ -210,7 +199,6 @@ fn write_to_output_file(output_spikes: Vec<Vec<u8>>, n_neurons: usize, n_instant
     }
 
     println!("{}","Done!".green());
-
     println!("{}","Writing data into file outputCounters.txt...".yellow());
 
     for i in 0..n_neurons {
@@ -218,7 +206,6 @@ fn write_to_output_file(output_spikes: Vec<Vec<u8>>, n_neurons: usize, n_instant
     }
 
     println!("{}","Done!".green());
-
 }
 
 /**

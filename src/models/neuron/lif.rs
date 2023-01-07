@@ -48,8 +48,6 @@ impl LifNeuron {
         self.tau
     }
 
-    pub fn get_dt(&self) -> f64 { self.dt }
-
     pub fn get_v_mem(&self) -> f64 {
         self.v_mem
     }

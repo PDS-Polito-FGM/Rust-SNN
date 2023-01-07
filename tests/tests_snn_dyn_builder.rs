@@ -32,9 +32,9 @@ fn verify_neuron(lif_neuron: &LifNeuron, v_th: f64, v_rest: f64, v_reset: f64, t
 fn test_add_one_layer() {
     #[rustfmt::skip]
 
-        let snn = DynSnnBuilder::<LifNeuron>::new(0)
-        .add_layer(vec![], vec![], vec![])
-        .build();
+    let snn = DynSnnBuilder::<LifNeuron>::new(0)
+            .add_layer(vec![], vec![], vec![])
+            .build();
 
     assert_eq!(snn.get_layers_number(),1);
 }
@@ -43,12 +43,12 @@ fn test_add_one_layer() {
 fn test_add_more_than_one_layer() {
     #[rustfmt::skip]
 
-        let snn = DynSnnBuilder::<LifNeuron>::new(0)
-        .add_layer(vec![], vec![], vec![])
-        .add_layer(vec![], vec![], vec![])
-        .add_layer(vec![], vec![], vec![])
-        .add_layer(vec![], vec![], vec![])
-        .build();
+    let snn = DynSnnBuilder::<LifNeuron>::new(0)
+            .add_layer(vec![], vec![], vec![])
+            .add_layer(vec![], vec![], vec![])
+            .add_layer(vec![], vec![], vec![])
+            .add_layer(vec![], vec![], vec![])
+            .build();
 
     assert_eq!(snn.get_layers_number(),4);
 }
@@ -57,7 +57,7 @@ fn test_add_more_than_one_layer() {
 fn test_add_weights_to_layers() {
     #[rustfmt::skip]
 
-        let snn_params = DynSnnBuilder::<LifNeuron>::new(3)
+    let snn_params = DynSnnBuilder::<LifNeuron>::new(3)
         .add_layer(vec![
             LifNeuron::new(0.3, 0.05, 0.1, 1.0, 1.0),
             LifNeuron::new(0.3, 0.05, 0.1, 1.0, 1.0)], vec![
@@ -88,7 +88,7 @@ fn test_add_weights_to_layers() {
 fn test_layer_with_one_neuron() {
     #[rustfmt::skip]
 
-        let snn_params = DynSnnBuilder::<LifNeuron>::new(5)
+    let snn_params = DynSnnBuilder::<LifNeuron>::new(5)
         .add_layer(vec![
             LifNeuron::new(0.12, 0.8, 0.03, 0.64, 1.0)], vec![
             vec![0.3, 0.5, 0.1, 0.6, 0.3]], vec![
@@ -168,7 +168,7 @@ fn test_neurons_with_same_parameters2() {
 fn test_layer_with_more_than_one_neuron() {
     #[rustfmt::skip]
 
-        let snn_params = DynSnnBuilder::<LifNeuron>::new(5)
+    let snn_params = DynSnnBuilder::<LifNeuron>::new(5)
         .add_layer(vec![
             LifNeuron::new(0.127, 0.46, 0.78, 0.67, 1.0),
             LifNeuron::new(0.12, 0.22, 0.31, 0.47, 1.0),
@@ -208,7 +208,7 @@ fn test_layer_with_more_than_one_neuron() {
 fn test_intra_layer_weights_with_one_neuron() {
     #[rustfmt::skip]
 
-        let snn_params = DynSnnBuilder::<LifNeuron>::new(5)
+    let snn_params = DynSnnBuilder::<LifNeuron>::new(5)
         .add_layer(vec![
             LifNeuron::new(0.12, 0.1, 0.03, 0.98, 1.0)], vec![
             vec![0.3, 0.5, 0.1, 0.6, 0.3]], vec![
@@ -232,7 +232,7 @@ fn test_intra_layer_weights_with_one_neuron() {
 fn test_intra_layer_weights_with_more_than_one_neuron() {
     #[rustfmt::skip]
 
-        let snn_params = DynSnnBuilder::<LifNeuron>::new(5)
+    let snn_params = DynSnnBuilder::<LifNeuron>::new(5)
         .add_layer(vec![
             LifNeuron::new(0.127, 0.12, 0.78, 0.67, 1.0),
             LifNeuron::new(0.12, 0.22, 0.31, 0.47, 1.0),
@@ -272,7 +272,7 @@ fn test_intra_layer_weights_with_more_than_one_neuron() {
 fn test_complete_snn() {
     #[rustfmt::skip]
 
-        let snn = DynSnnBuilder::<LifNeuron>::new(5)
+    let snn = DynSnnBuilder::<LifNeuron>::new(5)
         .add_layer(vec![
             LifNeuron::new(0.1, 0.1, 0.23, 0.45, 1.0),
             LifNeuron::new(0.3, 0.12, 0.54, 0.23, 1.0),
@@ -364,7 +364,7 @@ fn test_complete_snn() {
 fn test_snn_with_negative_weights() {
     #[rustfmt::skip]
 
-        let _snn = DynSnnBuilder::<LifNeuron>::new(2)
+    let _snn = DynSnnBuilder::<LifNeuron>::new(2)
         .add_layer(vec![
             LifNeuron::new(0.3, 0.05, 0.1, 1.0, 1.0)
         ], vec![
@@ -379,7 +379,7 @@ fn test_snn_with_negative_weights() {
 fn test_snn_with_positive_intra_weights() {
     #[rustfmt::skip]
 
-        let _snn = DynSnnBuilder::<LifNeuron>::new(2)
+    let _snn = DynSnnBuilder::<LifNeuron>::new(2)
         .add_layer(vec![
             LifNeuron::new(0.3, 0.05, 0.1, 1.0, 1.0),
             LifNeuron::new(0.3, 0.05, 0.1, 1.0, 1.0)

@@ -3,8 +3,8 @@ use crate::snn::neuron::Neuron;
 /* * LIF submodule * */
 
 /**
-Object representing a Neuron in the LIF (Leaky Integrate-and-Fire) model
- */
+    Object representing a Neuron in the LIF (Leaky Integrate-and-Fire) model
+*/
 #[derive(Debug)]
 pub struct LifNeuron {
     /* const fields */
@@ -64,7 +64,7 @@ impl Neuron for LifNeuron {
     */
     fn compute_v_mem(&mut self, t: u64, extra_weighted_sum: f64, intra_weighted_sum: f64) -> u8 {
         let weighted_sum = extra_weighted_sum +    /* positive contribute */
-            intra_weighted_sum      /* negative contribute */;
+                                intra_weighted_sum      /* negative contribute */;
 
         /* compute the neuron membrane potential with the LIF formula */
 

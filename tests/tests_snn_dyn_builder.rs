@@ -112,7 +112,7 @@ fn test_layer_with_one_neuron() {
 fn test_neurons_with_same_parameters1() {
     #[rustfmt::skip]
 
-let snn_params = DynSnnBuilder::<LifNeuron>::new(5)
+        let snn_params = DynSnnBuilder::<LifNeuron>::new(5)
         .add_layer_with_same_neurons(LifNeuron::new(0.12, 0.8, 0.03, 0.64, 1.0), 2, vec![
             vec![0.3, 0.5, 0.1, 0.6, 0.3],
             vec![0.2, 0.3, 0.1, 0.4, 0.2]], vec![
@@ -287,14 +287,14 @@ fn test_complete_snn() {
             vec![-0.05, -0.01, 0.0, -0.23],
             vec![-0.23, -0.23, -0.23, 0.0]
         ]).add_layer(vec![
-            LifNeuron::new(0.17, 0.12, 0.78, 0.67, 1.0),
-            LifNeuron::new(0.25, 0.36, 0.71, 0.84, 1.0)], vec![
-            vec![0.1, 0.3, 0.4, 0.2],
-            vec![0.7, 0.3, 0.1, 0.3]
-        ], vec![
-            vec![0.0, -0.62],
-            vec![-0.12, 0.0]
-        ]).build();
+        LifNeuron::new(0.17, 0.12, 0.78, 0.67, 1.0),
+        LifNeuron::new(0.25, 0.36, 0.71, 0.84, 1.0)], vec![
+        vec![0.1, 0.3, 0.4, 0.2],
+        vec![0.7, 0.3, 0.1, 0.3]
+    ], vec![
+        vec![0.0, -0.62],
+        vec![-0.12, 0.0]
+    ]).build();
 
     let snn_layers = snn.get_layers();
 
@@ -413,11 +413,11 @@ fn test_dyn_snn_wrong_extra_weights1() {
             vec![0.0, -0.5],
             vec![-0.05, 0.0]
         ]).add_layer(vec![
-            LifNeuron::new(0.1, 0.05, 0.1, 1.0, 1.0)], vec![
-            vec![0.3, 0.2, 0.4]
-        ], vec![
-            vec![0.0]
-        ]).build();
+        LifNeuron::new(0.1, 0.05, 0.1, 1.0, 1.0)], vec![
+        vec![0.3, 0.2, 0.4]
+    ], vec![
+        vec![0.0]
+    ]).build();
 }
 
 #[test]
@@ -464,12 +464,12 @@ fn test_dyn_snn_wrong_extra_weights2() {
             vec![0.0, -1.5],
             vec![-0.05, 0.0]
         ]).add_layer(vec![
-            LifNeuron::new(0.1, 0.05, 0.1, 1.0, 1.0)], vec![
-            vec![0.3, 0.2],
-            vec![0.1, 0.5]
-        ], vec![
-            vec![0.0]
-        ]).build();
+        LifNeuron::new(0.1, 0.05, 0.1, 1.0, 1.0)], vec![
+        vec![0.3, 0.2],
+        vec![0.1, 0.5]
+    ], vec![
+        vec![0.0]
+    ]).build();
 }
 
 #[test]

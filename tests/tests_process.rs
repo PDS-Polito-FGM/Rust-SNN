@@ -28,7 +28,7 @@ fn print_output(test_name: &str, output_spikes: Vec<Vec<u8>>) -> () {
 fn test_process_snn_with_only_one_layer() {
     #[rustfmt::skip]
 
-    let mut snn = SnnBuilder::new()
+        let mut snn = SnnBuilder::new()
         .add_layer()
         .weights([
             [0.1, 0.2],
@@ -56,7 +56,7 @@ fn test_process_snn_with_only_one_layer() {
 fn test_process_dyn_snn_with_only_one_layer() {
     #[rustfmt::skip]
 
-    let mut snn = DynSnnBuilder::new(2)
+        let mut snn = DynSnnBuilder::new(2)
         .add_layer(vec![
             LifNeuron::new(0.3, 0.05, 0.1, 1.0, 1.0),
             LifNeuron::new(0.3, 0.05, 0.1, 1.0, 1.0),
@@ -82,7 +82,7 @@ fn test_process_dyn_snn_with_only_one_layer() {
 fn test_process_snn_with_more_than_one_layer_and_same_neurons() {
     #[rustfmt::skip]
 
-    let mut snn = SnnBuilder::new()
+        let mut snn = SnnBuilder::new()
         .add_layer()
         .weights([
             [0.1, 0.2],
@@ -132,7 +132,7 @@ fn test_process_snn_with_more_than_one_layer_and_same_neurons() {
 fn test_process_snn_with_only_one_layer_and_different_neurons() {
     #[rustfmt::skip]
 
-    let mut snn = SnnBuilder::new()
+        let mut snn = SnnBuilder::new()
         .add_layer()
         .weights([
             [0.1, 0.2, 0.3, 0.4],
@@ -160,7 +160,7 @@ fn test_process_snn_with_only_one_layer_and_different_neurons() {
 fn test_process_snn_with_more_than_one_layer_and_different_neurons() {
     #[rustfmt::skip]
 
-    let mut snn = SnnBuilder::new()
+        let mut snn = SnnBuilder::new()
         .add_layer()
         .weights([
             [0.1, 0.2],
@@ -209,7 +209,7 @@ fn test_process_snn_with_more_than_one_layer_and_different_neurons() {
 fn test_process_dyn_snn_with_more_than_one_layer_and_different_neurons() {
     #[rustfmt::skip]
 
-    let mut snn = DynSnnBuilder::new(2)
+        let mut snn = DynSnnBuilder::new(2)
         .add_layer(vec![
             LifNeuron::new(0.5, 0.1, 0.2, 0.7, 1.0),
             LifNeuron::new(0.3, 0.05, 0.1, 1.0, 1.0)], vec![
@@ -249,7 +249,7 @@ fn test_process_dyn_snn_with_more_than_one_layer_and_different_neurons() {
 fn test_process_snn_with_different_neurons_and_more_than_five_input_spikes() {
     #[rustfmt::skip]
 
-    let mut snn = SnnBuilder::new()
+        let mut snn = SnnBuilder::new()
         .add_layer()
         .weights([
             [0.3, 0.21, 0.36, 0.47],
@@ -308,7 +308,7 @@ fn test_process_snn_with_all_zeros_as_input() {
 fn test_process_snn_with_zero_inputs() {
     #[rustfmt::skip]
 
-    let mut snn = SnnBuilder::new()
+        let mut snn = SnnBuilder::new()
         .add_layer()
         .weights([
             [0.1, 0.2, 0.3],
@@ -336,7 +336,7 @@ fn test_process_snn_with_zero_inputs() {
 fn test_process_snn_with_only_one_input() {
     #[rustfmt::skip]
 
-    let mut snn = SnnBuilder::new()
+        let mut snn = SnnBuilder::new()
         .add_layer()
         .weights([
             [0.1, 0.2],
@@ -421,7 +421,7 @@ fn test_process_snn_with_all_zeros_as_intra_weights() {
 fn test_input_spikes_greater_than_one() {
     #[rustfmt::skip]
 
-    let mut snn = SnnBuilder::new()
+        let mut snn = SnnBuilder::new()
         .add_layer()
         .weights([
             [0.12, 0.5],
@@ -442,7 +442,7 @@ fn test_input_spikes_greater_than_one() {
 fn test_dyn_snn_input_spikes_greater_than_one() {
     #[rustfmt::skip]
 
-    let mut snn = DynSnnBuilder::new(2)
+        let mut snn = DynSnnBuilder::new(2)
         .add_layer(vec![
             LifNeuron::new(0.3, 0.05, 0.84, 1.0, 1.0),
             LifNeuron::new(0.3, 0.87, 0.12, 0.89, 1.0)], vec![

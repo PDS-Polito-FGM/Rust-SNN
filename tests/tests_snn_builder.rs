@@ -32,7 +32,7 @@ fn verify_neuron(lif_neuron: &LifNeuron, v_th: f64, v_rest: f64, v_reset: f64, t
 fn test_add_one_layer() {
     #[rustfmt::skip]
 
-        let snn = SnnBuilder::<LifNeuron>::new()
+    let snn = SnnBuilder::<LifNeuron>::new()
         .add_layer::<0>()
         .weights([])
         .neurons([])
@@ -46,7 +46,7 @@ fn test_add_one_layer() {
 fn test_add_more_than_one_layer() {
     #[rustfmt::skip]
 
-        let snn = SnnBuilder::<LifNeuron>::new()
+    let snn = SnnBuilder::<LifNeuron>::new()
         .add_layer::<0>().weights([]).neurons([]).intra_weights([])
         .add_layer().weights([]).neurons([]).intra_weights([])
         .add_layer().weights([]).neurons([]).intra_weights([])
@@ -60,7 +60,7 @@ fn test_add_more_than_one_layer() {
 fn test_add_weights_to_layers() {
     #[rustfmt::skip]
 
-        let snn_params = SnnBuilder::<LifNeuron>::new()
+    let snn_params = SnnBuilder::<LifNeuron>::new()
         .add_layer()
         .weights([
             [0.1, 0.2, 0.3],
@@ -97,7 +97,7 @@ fn test_add_weights_to_layers() {
 fn test_layer_with_one_neuron() {
     #[rustfmt::skip]
 
-        let snn_params = SnnBuilder::new()
+    let snn_params = SnnBuilder::new()
         .add_layer()
         .weights([
             [0.3, 0.5, 0.1, 0.6, 0.3]
@@ -124,7 +124,7 @@ fn test_layer_with_one_neuron() {
 fn test_neurons_with_same_parameters1() {
     #[rustfmt::skip]
 
-        let snn_params = SnnBuilder::new()
+    let snn_params = SnnBuilder::new()
         .add_layer()
         .weights([
             [0.3, 0.5, 0.1, 0.6, 0.3],
@@ -156,7 +156,7 @@ fn test_neurons_with_same_parameters1() {
 fn test_neurons_with_same_parameters2() {
     #[rustfmt::skip]
 
-        let snn_params = SnnBuilder::new()
+    let snn_params = SnnBuilder::new()
         .add_layer()
         .weights([
             [0.3, 0.5, 0.1, 0.6, 0.3],
@@ -186,7 +186,7 @@ fn test_neurons_with_same_parameters2() {
 fn test_layer_with_more_than_one_neuron() {
     #[rustfmt::skip]
 
-        let snn_params = SnnBuilder::new()
+    let snn_params = SnnBuilder::new()
         .add_layer()
         .weights([
             [0.3, 0.5, 0.1, 0.6, 0.3],
@@ -229,7 +229,7 @@ fn test_layer_with_more_than_one_neuron() {
 fn test_intra_layer_weights_with_one_neuron() {
     #[rustfmt::skip]
 
-        let snn_params = SnnBuilder::new()
+    let snn_params = SnnBuilder::new()
         .add_layer()
         .weights([
             [0.3, 0.5, 0.1, 0.6, 0.3]
@@ -256,7 +256,7 @@ fn test_intra_layer_weights_with_one_neuron() {
 fn test_intra_layer_weights_with_more_than_one_neuron() {
     #[rustfmt::skip]
 
-        let snn_params = SnnBuilder::new()
+    let snn_params = SnnBuilder::new()
         .add_layer()
         .weights([
             [0.3, 0.5, 0.1, 0.6, 0.3],
@@ -299,7 +299,7 @@ fn test_intra_layer_weights_with_more_than_one_neuron() {
 fn test_complete_snn() {
     #[rustfmt::skip]
 
-        let snn = SnnBuilder::new()
+    let snn = SnnBuilder::new()
         .add_layer()
         .weights([
             [0.9, 0.42, 0.1, 0.31, 0.3],
@@ -396,7 +396,7 @@ fn test_complete_snn() {
 fn test_snn_with_negative_weights() {
     #[rustfmt::skip]
 
-        let _snn = SnnBuilder::new()
+    let _snn = SnnBuilder::new()
         .add_layer()
         .weights([
             [-0.2, 0.5]
@@ -412,7 +412,7 @@ fn test_snn_with_negative_weights() {
 fn test_snn_with_positive_intra_weights() {
     #[rustfmt::skip]
 
-        let _snn = SnnBuilder::new()
+    let _snn = SnnBuilder::new()
         .add_layer()
         .weights([
             [0.2, 0.5],

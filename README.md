@@ -77,7 +77,8 @@ pub struct LifNeuron {
   v_th:    f64,       /* threshold potential */
   v_rest:  f64,       /* resting potential */
   v_reset: f64,       /* reset potential */
-  tau:     f64,
+  tau:     f64, 
+  dt:      f64,       /* time interval between two consecutive instants */
   v_mem:   f64,       /* membrane potential */
   ts:      u64,       /* last instant in which receiving at least one spike */
   
@@ -263,9 +264,9 @@ use pds_snn::models::neuron::lif::LifNeuron;
                 [0.3, 0.4],
                 [0.5, 0.6]
             ]).neurons([
-                LifNeuron::new(0.3, 0.05, 0.1, 1.0),
-                LifNeuron::new(0.3, 0.05, 0.1, 1.0),
-                LifNeuron::new(0.3, 0.05, 0.1, 1.0)
+                LifNeuron::new(0.3, 0.05, 0.1, 1.0, 1.0),
+                LifNeuron::new(0.3, 0.05, 0.1, 1.0, 1.0),
+                LifNeuron::new(0.3, 0.05, 0.1, 1.0, 1.0)
             ]).intra_weights([
                 [0.0, -0.1, -0.15],
                 [-0.05, 0.0, -0.1],
@@ -276,8 +277,8 @@ use pds_snn::models::neuron::lif::LifNeuron;
                 [0.11, 0.29, 0.3],
                 [0.33, 0.41, 0.57]
             ]).neurons([
-                LifNeuron::new(0.3, 0.05, 0.1, 1.0),
-                LifNeuron::new(0.3, 0.05, 0.1, 1.0)
+                LifNeuron::new(0.3, 0.05, 0.1, 1.0, 1.0),
+                LifNeuron::new(0.3, 0.05, 0.1, 1.0, 1.0)
             ]).intra_weights([
                 [0.0, -0.25],
                 [-0.10, 0.0]
@@ -294,9 +295,9 @@ use pds_snn::models::neuron::lif::LifNeuron;
     let mut snn = DynSnnBuilder::new(2)
         .add_layer(     /* first layer*/
             vec![   /* neurons */
-                LifNeuron::new(0.3, 0.05, 0.1, 1.0),
-                LifNeuron::new(0.3, 0.05, 0.1, 1.0),
-                LifNeuron::new(0.3, 0.05, 0.1, 1.0)
+                LifNeuron::new(0.3, 0.05, 0.1, 1.0, 1.0),
+                LifNeuron::new(0.3, 0.05, 0.1, 1.0, 1.0),
+                LifNeuron::new(0.3, 0.05, 0.1, 1.0, 1.0)
             ], 
             vec![   /* weights */
                 vec![0.1, 0.2],
@@ -310,8 +311,8 @@ use pds_snn::models::neuron::lif::LifNeuron;
             ]
         ).add_layer(    /* second layer */
             vec![   /* neurons */
-                    LifNeuron::new(0.3, 0.05, 0.1, 1.0),
-                    LifNeuron::new(0.3, 0.05, 0.1, 1.0)
+                    LifNeuron::new(0.3, 0.05, 0.1, 1.0, 1.0),
+                    LifNeuron::new(0.3, 0.05, 0.1, 1.0, 1.0)
             ],
             vec![   /* weights */
                     vec![0.11, 0.29, 0.3],

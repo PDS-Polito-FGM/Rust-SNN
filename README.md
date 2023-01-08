@@ -260,7 +260,7 @@ use pds_snn::models::neuron::lif::LifNeuron;
 
 
  let mut snn = SnnBuilder::new()
-        .add_layer()    /* first layer (input dimension automatically inferred )*/
+        .add_layer()    /* first layer (input dimension automatically inferred) */
             .weights([
                 [0.1, 0.2],     /* weigths from input layer to the 1st neuron */
                 [0.3, 0.4],     /* weigths from input layer to the 2nd neuron */
@@ -294,8 +294,8 @@ use pds_snn::models::neuron::lif::LifNeuron;
         [0,0,1]     /* 2ns neuron input */
     ]);    
 ```
-The following example shows how to *dynamically* create a `Spiking Neural Network` with 2 input neurons and
-and a single layer of 3 `LifNeuron`s using the `DynSnnBuilder`, and how to execute it on a given input of 3 instants per neuron.
+The following example shows how to *dynamically* create a `Spiking Neural Network` with 2 input neurons and 
+a single layer of 3 `LifNeuron`s using the `DynSnnBuilder`, and how to execute it on a given input of 3 instants per neuron.
 
 ```rust
 use pds_snn::builders::DynSnnBuilder;

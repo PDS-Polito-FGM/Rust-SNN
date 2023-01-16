@@ -27,8 +27,8 @@ No other particular dependencies are required.
 
 ## Repos Structure
 The repository is structured as follows:
-- `bin/` contains the demo scripts
 - `src/` contains the **source code** of the library
+  + `bin/`    contains the demo scripts
   + `models/` contains the specific models' implementations (here only `Lif Neuron`)
   + `snn/`    contains the SNN generic implementation
     + `builders` contains the builder objects for the SNN

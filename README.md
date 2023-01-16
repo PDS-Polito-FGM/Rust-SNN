@@ -2,7 +2,7 @@
 - [Description](#description)
 - [Group Members](#group-members)
 - [Dependencies](#dependencies)
-- [File Structure](#file-structure)
+- [Repos Structure](#repos-structure)
 - [Organization](#organization)
 - [Main Structures](#main-structures)
 - [Main Methods](#main-methods)
@@ -25,9 +25,10 @@ It does *not* support the training phase of the network, but only the execution 
 
 No other particular dependencies are required.
 
-## File Structure
-The code is structured as follows:
-- `src/` contains the source code of the library
+## Repos Structure
+The repository is structured as follows:
+- `bin/` contains the demo scripts
+- `src/` contains the **source code** of the library
   + `models/` contains the specific models' implementations (here only `Lif Neuron`)
   + `snn/`    contains the SNN generic implementation
     + `builders` contains the builder objects for the SNN

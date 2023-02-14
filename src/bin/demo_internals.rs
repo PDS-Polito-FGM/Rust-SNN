@@ -24,3 +24,6 @@ pub mod demo_internals {
     }
 }
 
+#[allow(dead_code)]
+fn main() {}
+

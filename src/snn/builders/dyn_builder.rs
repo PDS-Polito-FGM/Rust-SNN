@@ -150,7 +150,7 @@ impl<N: Neuron + Clone> DynSnnBuilder<N> {
             panic!("The network must have at least one layer");
         }
 
-        if  self.params.neurons.len() != self.params.extra_weights.len() &&
+        if  self.params.neurons.len() != self.params.extra_weights.len() ||
             self.params.neurons.len() != self.params.intra_weights.len() {
             /* it must not happen */
             panic!("Error: the number of neurons layers does not correspond to the number of weights layers")

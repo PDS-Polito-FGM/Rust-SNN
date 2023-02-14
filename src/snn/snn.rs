@@ -52,7 +52,6 @@ SNN<N, NET_INPUT_DIM, NET_OUTPUT_DIM> {
         let input_spike_events = SNN::<N, NET_INPUT_DIM, NET_OUTPUT_DIM>::encode_spikes(spikes);
 
         /* process input and produce SNN output spikes */
-        // let output_spike_events = self.process_events(input_spike_events);
         let processor = Processor {};
         let output_spike_events = processor.process_events(self, input_spike_events);
 
